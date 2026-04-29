@@ -30,6 +30,16 @@
                         >
                             Dashboard
                         </a>
+
+                        <form method="POST" action="{{ url('/logout') }}">
+                            @csrf
+                            <button
+                                type="submit"
+                                class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] border border-transparent hover:border-[#19140035] text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal"
+                            >
+                                Log out
+                            </button>
+                        </form>
                     @else
                         <a
                             href="{{ route('login') }}"

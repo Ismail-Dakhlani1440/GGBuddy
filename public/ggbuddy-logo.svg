@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="GGbuddy logo">
+  <defs>
+    <linearGradient id="g" x1="30" y1="30" x2="226" y2="226" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8B5CF6"/>
+      <stop offset="0.52" stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#C084FC"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feColorMatrix in="b" type="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.6 0" result="c"/>
+      <feMerge>
+        <feMergeNode in="c"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- soft neon plate -->
+  <path d="M56 70c26-34 118-44 144 0 18 29 18 87 0 116-26 44-118 34-144 0-18-29-18-87 0-116Z"
+        fill="rgba(139,92,246,0.12)"/>
+
+  <!-- controller-ish buddy -->
+  <g filter="url(#glow)">
+    <path d="M76 112c0-22 17-40 39-40h26c22 0 39 18 39 40v32c0 21-17 40-39 40h-26c-22 0-39-19-39-40v-32Z"
+          fill="none" stroke="url(#g)" stroke-width="14" stroke-linecap="round"/>
+
+    <!-- triggers -->
+    <path d="M104 126h-16c-10 0-18-8-18-18v-1"
+          fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M152 126h16c10 0 18-8 18-18v-1"
+          fill="none" stroke="url(#g)" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- face -->
+    <circle cx="122" cy="140" r="8" fill="#EDEDEC"/>
+    <circle cx="150" cy="140" r="8" fill="#EDEDEC"/>
+    <path d="M118 162c7 10 25 10 32 0" fill="none" stroke="#EDEDEC" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- d-pad-ish -->
+    <path d="M116 110h16" stroke="#8B5CF6" stroke-width="8" stroke-linecap="round"/>
+    <path d="M124 102v16" stroke="#8B5CF6" stroke-width="8" stroke-linecap="round"/>
+    <path d="M136 110h16" stroke="#A855F7" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <!-- tiny homie stars -->
+  <g fill="#C084FC" opacity="0.9">
+    <path d="M68 98l4 10 10 4-10 4-4 10-4-10-10-4 10-4 4-10Z"/>
+    <path d="M188 92l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z"/>
+  </g>
+</svg>

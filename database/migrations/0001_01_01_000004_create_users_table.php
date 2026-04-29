@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
             $table->string('name');
+            $table->string('display_name');
+            $table->string('avatar')->nullable();
+            $table->string('timezone');
             $table->string('email')->unique();
             $table->string('password');
             $table->timestamps();
