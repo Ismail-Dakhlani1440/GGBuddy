@@ -376,10 +376,7 @@
         </div>
 
         <div class="nav-right">
-            <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);border-radius:100px;font-size:11px;font-weight:700;color:var(--green);">
-                <span style="width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite;flex-shrink:0;"></span>
-                <span class="nav-online-label">Online</span>
-            </div>
+
             <a href="{{ route('ebuddy.profile') }}" class="nav-avatar">
                 <img src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . auth()->user()->name }}">
             </a>

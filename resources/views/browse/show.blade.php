@@ -15,7 +15,7 @@
                 <div style="width:100px;height:100px;border-radius:50%;overflow:hidden;border:4px solid var(--bg);">
                     <img src="{{ $ebuddy->avatar ? asset('storage/'.$ebuddy->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed='.$ebuddy->name }}" style="width:100%;height:100%;object-fit:cover;">
                 </div>
-                <span style="position:absolute;bottom:6px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--green);border:3px solid var(--bg);box-shadow:0 0 8px rgba(34,197,94,0.6);"></span>
+
             </div>
 
             {{-- Name --}}

@@ -177,9 +177,7 @@
             <a href="{{ route('browse.my-orders') }}" class="nav-link {{ request()->routeIs('browse.my-orders') ? 'active' : '' }}">My Orders</a>
         </div>
         <div class="nav-right">
-            <span style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:100px;font-size:11px;font-weight:700;color:var(--accent-light);">
-                <span class="nav-online-label">Player</span>
-            </span>
+
             <div class="nav-avatar">
                 <img src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . auth()->user()->name }}">
             </div>
