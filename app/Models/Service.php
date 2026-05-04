@@ -11,7 +11,6 @@ class Service extends Model
     protected $fillable = [
         'e_buddy_id',
         'game_id',
-        'rank_id',
         'title',
         'description',
         'price',
@@ -39,13 +38,17 @@ class Service extends Model
         return $this->belongsTo(Game::class);
     }
 
-    public function rank(): BelongsTo
-    {
-        return $this->belongsTo(Rank::class);
-    }
-
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function getRankAttribute()
+    {
+        $profile = PlayerGameProfile::where('user_id', $this->e_buddy_id)
+            ->where('game_id', $this->game_id)
+            ->first();
+
+        return $profile ? ($profile->currentRank ?? $profile->peakRank) : null;
     }
 }

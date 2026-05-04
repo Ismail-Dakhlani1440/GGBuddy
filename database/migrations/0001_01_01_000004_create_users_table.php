@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('timezone');
             $table->string('email')->unique();
             $table->string('password');
+            $table->boolean('is_suspended')->default(false);
             $table->timestamps();
         });
 
