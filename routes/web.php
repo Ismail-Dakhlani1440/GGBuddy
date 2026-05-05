@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Dashboard\ProfileController;
 use App\Http\Controllers\Dashboard\GameLibraryController;
+use App\Http\Controllers\Dashboard\GameManagementController;
 use App\Http\Controllers\Dashboard\OrderController;
 use App\Http\Controllers\Dashboard\ScheduleController;
 use App\Http\Controllers\Dashboard\ServiceController;
@@ -98,11 +99,21 @@ Route::middleware('auth')->group(function () {
         Route::get('/users', [AdminController::class, 'indexUsers'])->name('users.index');
         Route::get('/reports', [AdminController::class, 'indexReports'])->name('reports.index');
         Route::get('/reports/{report}', [AdminController::class, 'showReport'])->name('reports.show');
+        Route::post('/reports/{report}/dismiss', [AdminController::class, 'dismissReport'])->name('reports.dismiss');
         Route::post('/users/{user}/suspend', [AdminController::class, 'toggleSuspension'])->name('users.suspend');
         
         Route::get('/ebuddies', [AdminController::class, 'ebuddyApplications'])->name('ebuddies.index');
         Route::post('/ebuddies/{ebuddy}/approve', [AdminController::class, 'approveEBuddy'])->name('ebuddies.approve');
-        Route::post('/ebuddies/{ebuddy}/reject', [AdminController::class, 'rejectEBuddy'])->name('ebuddies.reject');
+        Route::get('/ebuddies/{ebuddy}/reject', [AdminController::class, 'rejectEBuddy'])->name('ebuddies.reject');
+
+        // Game Management
+        Route::get('/games', [GameManagementController::class, 'index'])->name('games.index');
+        Route::get('/games/create', [GameManagementController::class, 'create'])->name('games.create');
+        Route::post('/games', [GameManagementController::class, 'store'])->name('games.store');
+        Route::get('/games/{game}/edit', [GameManagementController::class, 'edit'])->name('games.edit');
+        Route::post('/games/{game}', [GameManagementController::class, 'update'])->name('games.update');
+        Route::delete('/games/{game}', [GameManagementController::class, 'destroy'])->name('games.destroy');
+        Route::delete('/ranks/{rank}', [GameManagementController::class, 'deleteRank'])->name('ranks.destroy');
     });
 
 

@@ -22,7 +22,7 @@ class AdminController extends Controller
     public function dashboard()
     {
         $pendingEbuddiesCount = EBuddy::where('status', 'pending')->count();
-        $reportsCount = Report::count();
+        $reportsCount = Report::where('status', 'pending')->count();
         $usersCount = User::count();
         
         return view('dashboards.admin.overview', compact('pendingEbuddiesCount', 'reportsCount', 'usersCount'));
@@ -43,7 +43,10 @@ class AdminController extends Controller
      */
     public function indexReports()
     {
-        $reports = Report::with(['reporter', 'target'])->latest()->paginate(20);
+        $reports = Report::with(['reporter', 'target'])
+            ->where('status', 'pending')
+            ->latest()
+            ->paginate(20);
         
         return view('dashboards.admin.reports.index', compact('reports'));
     }
@@ -56,6 +59,18 @@ class AdminController extends Controller
         $report->load(['reporter', 'target']);
         
         return view('dashboards.admin.reports.show', compact('report'));
+    }
+
+    /**
+     * Dismiss a report without taking action.
+     */
+    public function dismissReport(Report $report)
+    {
+        $report->status = 'resolved';
+        $report->resolved_at = now();
+        $report->save();
+
+        return redirect()->route('admin.reports.index')->with('success', 'Report has been dismissed.');
     }
 
     /**

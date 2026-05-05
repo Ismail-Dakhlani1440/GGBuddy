@@ -76,6 +76,8 @@
         <a href="{{ route('admin.dashboard') }}" class="logo">GGBuddy Admin</a>
         <div class="nav-links">
             <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Overview</a>
+            <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">Users</a>
+            <a href="{{ route('admin.games.index') }}" class="nav-link {{ request()->routeIs('admin.games.*') ? 'active' : '' }}">Games</a>
             <a href="{{ route('admin.reports.index') }}" class="nav-link {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}">Reports</a>
             <a href="{{ route('admin.ebuddies.index') }}" class="nav-link {{ request()->routeIs('admin.ebuddies.*') ? 'active' : '' }}">Applications</a>
         </div>

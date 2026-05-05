@@ -52,6 +52,14 @@
                 Submitted {{ $report->created_at->format('F j, Y \a\t g:i a') }}
             </div>
             <div style="display:flex;gap:12px;">
+                <form action="{{ route('admin.reports.dismiss', $report) }}" method="POST">
+                    @csrf
+                    <button type="submit" 
+                            style="padding:12px 24px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:12px;color:var(--text-2);cursor:pointer;font-size:14px;font-weight:700;transition:all 0.2s;"
+                            onmouseover="this.style.color='white';this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.color='var(--text-2)';this.style.background='rgba(255,255,255,0.05)'">
+                        Dismiss Report
+                    </button>
+                </form>
                 <form action="{{ route('admin.users.suspend', $report->target) }}" method="POST">
                     @csrf
                     <button type="submit" 

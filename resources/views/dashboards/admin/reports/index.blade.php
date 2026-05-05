@@ -66,6 +66,14 @@
                                    onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
                                     View Details
                                 </a>
+                                <form action="{{ route('admin.reports.dismiss', $report) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    <button type="submit" 
+                                            style="padding:6px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;color:var(--text-3);cursor:pointer;font-size:12px;font-weight:700;transition:all 0.2s;"
+                                            onmouseover="this.style.color='white';this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.color='var(--text-3)';this.style.background='rgba(255,255,255,0.03)'">
+                                        Dismiss
+                                    </button>
+                                </form>
                                 <form action="{{ route('admin.users.suspend', $report->target) }}" method="POST" style="display:inline;">
                                     @csrf
                                     <button type="submit" 

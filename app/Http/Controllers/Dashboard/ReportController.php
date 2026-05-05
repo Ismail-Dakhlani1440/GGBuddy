@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Report;
-use App\Http\Requests\Dashboard\StoreReportRequest;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -14,19 +13,20 @@ class ReportController extends Controller
         $this->middleware('auth');
     }
 
-    public function store(StoreReportRequest $request)
+    public function store(Request $request)
     {
-        $target = User::findOrFail($request->target_id);
-
-        Gate::authorize('create', [Report::class, $target]);
-
-        Report::create([
-            'reporter_id' => auth()->id(),
-            'target_id'   => $target->id,
-            'reason'      => $request->reason,
-            'status'      => 'pending',
+        $validated = $request->validate([
+            'target_id' => 'required|exists:users,id',
+            'reason'    => 'required|string|min:5|max:1000',
         ]);
 
-        return back()->with('success', 'User reported. Our team will investigate.');
+        $report = new Report();
+        $report->reporter_id = auth()->id();
+        $report->target_id = $validated['target_id'];
+        $report->reason = $validated['reason'];
+        $report->status = 'pending';
+        $report->save();
+
+        return back()->with('success', 'User reported successfully. Admin will review it.');
     }
 }

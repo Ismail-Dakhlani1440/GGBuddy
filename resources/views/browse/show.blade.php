@@ -67,7 +67,7 @@
                                 
                                 <form action="{{ route('report.store') }}" method="POST" style="display:flex;flex-direction:column;gap:18px;">
                                     @csrf
-                                    <input type="hidden" name="reported_id" value="{{ $user->id }}">
+                                    <input type="hidden" name="target_id" value="{{ $user->id }}">
                                     
                                     <div class="form-group">
                                         <label class="form-label">Reason for report</label>
