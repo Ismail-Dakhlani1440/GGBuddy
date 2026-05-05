@@ -36,7 +36,7 @@ class ChatRoom extends Model
 
     public function eBuddy(): BelongsTo
     {
-        return $this->belongsTo(EBuddy::class, 'e_buddy_id', 'user_id');
+        return $this->belongsTo(User::class, 'e_buddy_id');
     }
 
     public function messages(): HasMany

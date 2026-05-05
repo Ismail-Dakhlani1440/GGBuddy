@@ -17,7 +17,28 @@ class ProfileController extends Controller
         $user = request()->user();
         $userProfiles = $user->gameProfiles()->with(['game', 'currentRank'])->get();
 
+        if ($user->isEBuddy()) {
+            $user->load(['eBuddy.reviews.player']);
+        }
+
         return view('dashboards.profile.view', [
+            'user' => $user,
+            'ebuddy' => $user->eBuddy,
+            'userProfiles' => $userProfiles,
+        ]);
+    }
+
+    public function publicProfile(\App\Models\User $user)
+    {
+        // If viewing own profile, redirect to the dashboard view
+        if ($user->id === auth()->id()) {
+            return redirect()->route('profile');
+        }
+
+        $user->load(['eBuddy.services.game', 'gameProfiles.game', 'gameProfiles.currentRank']);
+        $userProfiles = $user->gameProfiles;
+
+        return view('dashboards.profile.public', [
             'user' => $user,
             'ebuddy' => $user->eBuddy,
             'userProfiles' => $userProfiles,
@@ -45,6 +66,8 @@ class ProfileController extends Controller
             'avatar' => 'nullable|image|max:2048',
             'bio' => 'nullable|string|max:1000',
             'banner' => 'nullable|image|max:4096|dimensions:min_width=1200,min_height=400',
+            'browser_notifications' => 'nullable|boolean',
+            'sound_enabled' => 'nullable|boolean',
         ]);
 
         // Handle Avatar Upload
@@ -57,6 +80,15 @@ class ProfileController extends Controller
             'display_name' => $validated['display_name'] ?? $user->display_name,
             'timezone' => $validated['timezone'] ?? $user->timezone,
         ]);
+
+        // Update Notification Settings
+        $user->notificationSetting()->updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'browser_notifications' => request()->has('browser_notifications'),
+                'sound_enabled' => request()->has('sound_enabled'),
+            ]
+        );
 
         if ($ebuddy) {
             // Handle Banner Upload

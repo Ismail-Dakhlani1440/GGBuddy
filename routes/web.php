@@ -9,6 +9,7 @@ use App\Http\Controllers\Dashboard\GameLibraryController;
 use App\Http\Controllers\EBuddyOrderController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -59,18 +60,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/ebuddy/unavailability', [ScheduleController::class, 'storeUnavailability'])->name('ebuddy.unavailability.store');
     Route::delete('/ebuddy/unavailability/{unavailability}', [ScheduleController::class, 'destroyUnavailability'])->name('ebuddy.unavailability.destroy');
 
-    // E-Buddy Orders Management
-    Route::get('/ebuddy/orders', [EBuddyOrderController::class, 'index'])->name('ebuddy.orders');
-    Route::post('/ebuddy/orders/{order}/accept', [EBuddyOrderController::class, 'accept'])->name('ebuddy.orders.accept');
-    Route::post('/ebuddy/orders/{order}/refuse', [EBuddyOrderController::class, 'refuse'])->name('ebuddy.orders.refuse');
+    // Reporting
+    Route::post('/report', [\App\Http\Controllers\ReportController::class, 'store'])->name('report.store');
+
+    // Unified Orders Management
+    Route::get('/orders', [\App\Http\Controllers\Dashboard\OrderController::class, 'index'])->name('orders');
+    Route::post('/orders/{order}/accept', [\App\Http\Controllers\Dashboard\OrderController::class, 'accept'])->name('orders.accept');
+    Route::post('/orders/{order}/refuse', [\App\Http\Controllers\Dashboard\OrderController::class, 'refuse'])->name('orders.refuse');
+    Route::post('/orders/{order}/pay', [\App\Http\Controllers\Dashboard\OrderController::class, 'pay'])->name('orders.pay');
+    Route::post('/orders/{order}/cancel', [\App\Http\Controllers\Dashboard\OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/complete', [\App\Http\Controllers\Dashboard\OrderController::class, 'complete'])->name('orders.complete');
+    Route::post('/orders/{order}/review', [\App\Http\Controllers\Dashboard\ReviewController::class, 'store'])->name('orders.review');
 
     // Browse E-Buddies (shared — both Player and E-Buddy can use these)
     Route::get('/browse', [\App\Http\Controllers\BrowseController::class, 'index'])->name('browse.index');
     Route::get('/browse/{ebuddy}', [\App\Http\Controllers\BrowseController::class, 'show'])->name('browse.show');
     Route::post('/browse/order/{service}', [\App\Http\Controllers\BrowseController::class, 'order'])->name('browse.order');
-    Route::get('/my-orders', [\App\Http\Controllers\BrowseController::class, 'myOrders'])->name('browse.my-orders');
+    Route::get('/my-orders', fn() => redirect()->route('orders', ['type' => 'outgoing']))->name('browse.my-orders');
 
     // Player dashboard
     Route::get('/player', [\App\Http\Controllers\BrowseController::class, 'index'])->name('player.dashboard');
+
+    // Chat
+    Route::get('/chat/{roomId?}', [ChatController::class, 'index'])->name('chat');
+    Route::post('/chat/start/{userId}', [ChatController::class, 'start'])->name('chat.start');
 });
 

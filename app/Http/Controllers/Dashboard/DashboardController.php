@@ -44,9 +44,9 @@ class DashboardController extends Controller
         if (!$user->isEBuddy()) abort(403);
         $ebuddy = $user->eBuddy;
         
-        $totalOrders = $ebuddy->orders()->count();
+        $totalOrders = $ebuddy->getSessionCount();
         $pendingOrders = $ebuddy->orders()->where('status', 'pending')->count();
-        $totalEarnings = $ebuddy->orders()->where('status', 'paid')->sum('total_amount');
+        $totalEarnings = $ebuddy->getTotalEarnings();
         
         return view('dashboards.ebuddy', compact('ebuddy', 'totalOrders', 'pendingOrders', 'totalEarnings'));
     }

@@ -73,5 +73,8 @@ class DatabaseSeeder extends Seeder
             'password' => 'password',
             'is_suspended' => true,
         ]);
+
+        $this->call(DemoDataSeeder::class);
+        $this->call(ReviewSeeder::class);
     }
 }

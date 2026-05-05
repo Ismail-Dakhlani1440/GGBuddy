@@ -52,6 +52,9 @@
                     ['id' => 'overview', 'label' => 'Overview'],
                     ['id' => 'games',    'label' => 'Games (' . $userProfiles->count() . ')'],
                 ];
+                if ($user->isEBuddy()) {
+                    $tabs[] = ['id' => 'reviews', 'label' => 'Reviews (' . ($ebuddy->reviews->count() ?? 0) . ')'];
+                }
                 $activeTab = request('tab', 'overview');
             @endphp
             @foreach($tabs as $tab)
@@ -86,13 +89,58 @@
                     <p class="section-title">Games</p>
                     <a href="?tab=games" style="font-size:12px;font-weight:600;color:var(--accent-light);text-decoration:none;">See all →</a>
                 </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
                     @foreach($userProfiles->take(4) as $profile)
                     <div style="padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
                         <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:4px;">{{ $profile->game->title }}</p>
                         <p style="font-size:14px;font-weight:700;color:var(--text);">{{ $profile->currentRank->title ?? 'Unranked' }}</p>
                     </div>
                     @endforeach
+                </div>
+            </div>
+            @endif
+
+            @if($user->isEBuddy())
+            <div style="margin-top:8px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <p class="section-title" style="margin:0; display:flex; align-items:center; gap:8px;">
+                        Recent Reviews 
+                        <span style="font-size:12px; font-weight:500; color:var(--text-3); background:var(--surface2); padding:2px 8px; border-radius:6px; border:1px solid var(--border);">{{ $ebuddy->reviews->count() }}</span>
+                    </p>
+                    @if($ebuddy->reviews->count() > 3)
+                        <a href="?tab=reviews" style="font-size:12px; color:var(--accent-light); font-weight:700; text-decoration:none;">See All</a>
+                    @endif
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                    @forelse($ebuddy->reviews->sortByDesc('created_at')->take(3) as $review)
+                    <div class="card" style="padding:20px; border-color:var(--border);">
+                        <div style="display:flex;gap:14px;">
+                            <a href="{{ route('browse.show', $review->player->id) }}" style="width:40px;height:40px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);text-decoration:none;">
+                                <img src="{{ $review->player->avatar ? asset('storage/'.$review->player->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed='.$review->player->name }}" style="width:100%;height:100%;object-fit:cover;">
+                            </a>
+                            <div style="flex:1;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+                                    <div>
+                                        <a href="{{ route('browse.show', $review->player->id) }}" style="font-size:13px;font-weight:800;margin-bottom:2px;color:var(--text);text-decoration:none;display:block;transition:color 0.15s;" onmouseover="this.style.color='var(--accent-light)'" onmouseout="this.style.color='var(--text)'">
+                                            {{ $review->player->display_name ?? $review->player->name }}
+                                        </a>
+                                        <div style="display:flex;gap:2px;">
+                                            @foreach($review->starsArray() as $isFilled)
+                                                <svg width="12" height="12" fill="{{ $isFilled ? 'var(--yellow)' : 'rgba(255,255,255,0.05)' }}" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <span style="font-size:11px;color:var(--text-3);">{{ $review->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p style="font-size:13px;color:var(--text-2);line-height:1.5;">{{ $review->comment ?? 'No comment provided.' }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="card" style="padding:40px 20px;text-align:center;border:1.5px dashed var(--border);background:rgba(255,255,255,0.01);">
+                        <p style="color:var(--text-3);font-size:13px;">You haven't received any reviews yet.</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
             @endif
@@ -104,8 +152,9 @@
             <p class="section-title" style="margin-bottom:16px;">Stats</p>
             @php $pstats = [
                 ['label'=>'Rating',     'value'=> number_format($ebuddy->global_rating,1).' ★', 'color'=>'var(--yellow)'],
-                ['label'=>'Completion', 'value'=>'98%',                                          'color'=>'var(--green)'],
-                ['label'=>'Sessions',   'value'=>'42',                                           'color'=>'var(--accent-light)'],
+                ['label'=>'Earnings',   'value'=> '$'.number_format($ebuddy->getTotalEarnings(),2), 'color'=>'var(--green)'],
+                ['label'=>'Completion', 'value'=> $ebuddy->getCompletionRate().'%',               'color'=>'var(--accent-light)'],
+                ['label'=>'Sessions',   'value'=> $ebuddy->getSessionCount(),                    'color'=>'var(--text)'],
                 ['label'=>'Games',      'value'=> $userProfiles->count(),                        'color'=>'var(--text)'],
             ]; @endphp
             @foreach($pstats as $s)
@@ -142,8 +191,65 @@
             </div>
             @endforelse
         </div>
+    @elseif($activeTab === 'reviews' && $user->isEBuddy())
+    <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
+            <div>
+                <h2 style="font-size:1.2rem;font-weight:800;margin-bottom:4px;">My Reviews</h2>
+                <p style="font-size:13px;color:var(--text-2);">Feedback received from players you've helped.</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:12px;font-weight:600;color:var(--text-3);">Sort by:</span>
+                <select onchange="window.location.href=this.value" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-weight:600;outline:none;cursor:pointer;">
+                    <option value="?tab=reviews&sort=newest" {{ request('sort') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                    <option value="?tab=reviews&sort=highest" {{ request('sort') === 'highest' ? 'selected' : '' }}>Highest Rated</option>
+                    <option value="?tab=reviews&sort=lowest" {{ request('sort') === 'lowest' ? 'selected' : '' }}>Lowest Rated</option>
+                </select>
+            </div>
+        </div>
+
+        @php
+            $reviews = $ebuddy->reviews;
+            $sort = request('sort', 'newest');
+            if ($sort === 'highest') {
+                $reviews = $reviews->sortByDesc('rating');
+            } elseif ($sort === 'lowest') {
+                $reviews = $reviews->sortBy('rating');
+            } else {
+                $reviews = $reviews->sortByDesc('created_at');
+            }
+        @endphp
+
+        @forelse($reviews as $review)
+        <div class="card" style="padding:24px;">
+            <div style="display:flex;gap:16px;">
+                <a href="{{ route('browse.show', $review->player->id) }}" style="width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid var(--border);text-decoration:none;">
+                    <img src="{{ $review->player->avatar ? asset('storage/'.$review->player->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed='.$review->player->name }}" style="width:100%;height:100%;object-fit:cover;">
+                </a>
+                <div style="flex:1;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                        <div>
+                            <a href="{{ route('browse.show', $review->player->id) }}" style="font-size:14px;font-weight:800;margin-bottom:2px;color:var(--text);text-decoration:none;display:block;transition:color 0.15s;" onmouseover="this.style.color='var(--accent-light)'" onmouseout="this.style.color='var(--text)'">
+                                {{ $review->player->display_name ?? $review->player->name }}
+                            </a>
+                            <div style="display:flex;gap:2px;">
+                                @foreach($review->starsArray() as $isFilled)
+                                    <svg width="14" height="14" fill="{{ $isFilled ? 'var(--yellow)' : 'rgba(255,255,255,0.05)' }}" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                @endforeach
+                            </div>
+                        </div>
+                        <span style="font-size:12px;color:var(--text-3);">{{ $review->created_at->diffForHumans() }}</span>
+                    </div>
+                    <p style="font-size:14px;color:var(--text-2);line-height:1.6;">{{ $review->comment ?? 'No comment provided.' }}</p>
+                </div>
+            </div>
+        </div>
+        @empty
+        <div class="card" style="padding:60px 20px;text-align:center;border:1.5px dashed var(--border);background:rgba(255,255,255,0.01);">
+            <p style="color:var(--text-3);font-size:14px;">You haven't received any reviews yet.</p>
+        </div>
+        @endforelse
     </div>
     @endif
-
 </div>
 @endsection

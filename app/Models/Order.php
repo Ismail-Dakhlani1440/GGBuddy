@@ -14,15 +14,19 @@ class Order extends Model
         'service_id',
         'status',
         'total_amount',
+        'hours',
         'refuse_reason',
         'expires_at',
+        'paid_at',
     ];
 
     protected function casts(): array
     {
         return [
             'total_amount' => 'float',
+            'hours'        => 'integer',
             'expires_at'   => 'datetime',
+            'paid_at'      => 'datetime',
         ];
     }
 
@@ -33,11 +37,22 @@ class Order extends Model
     public function isCompleted(): bool { return $this->status === 'completed'; }
     public function isRefused(): bool   { return $this->status === 'refused'; }
     public function isPaid(): bool      { return $this->status === 'paid'; }
-
+    public function isCancelled(): bool { return $this->status === 'cancelled'; }
     public function isExpired(): bool
     {
         return $this->status === 'expired'
-            || ($this->isPending() && now()->isAfter($this->expires_at));
+            || ($this->isPending() && $this->expires_at && now()->isAfter($this->expires_at));
+    }
+
+    public function hasSessionEnded(): bool
+    {
+        if (!$this->isPaid() || !$this->paid_at) return false;
+        return now()->isAfter($this->paid_at->addHours($this->hours));
+    }
+
+    public function canBeCompleted(): bool
+    {
+        return $this->isPaid() && $this->hasSessionEnded();
     }
 
     // ── Action Helpers ─────────────────────────────────────────────────────
@@ -50,14 +65,39 @@ class Order extends Model
     public function confirm(): void
     {
         $this->update(['status' => 'confirmed']);
+        
+        // Create initial processing payment
+        $this->payment()->updateOrCreate([], [
+            'amount' => $this->total_amount,
+            'status' => 'processing',
+        ]);
     }
 
-    public function refuse(string $reason = ''): void
+    public function refuse(string $reason): void
     {
         $this->update([
             'status'        => 'refused',
             'refuse_reason' => $reason,
         ]);
+    }
+
+    public function pay(): void
+    {
+        $this->update([
+            'status'  => 'paid',
+            'paid_at' => now(),
+        ]);
+        if ($this->payment) {
+            $this->payment->update(['status' => 'succeeded']);
+        }
+    }
+
+    public function cancel(): void
+    {
+        $this->update(['status' => 'cancelled']);
+        if ($this->payment) {
+            $this->payment->update(['status' => 'canceled']);
+        }
     }
 
     public function complete(): void
@@ -119,5 +159,31 @@ class Order extends Model
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
+    }
+
+    public function isReviewed(): bool
+    {
+        return $this->review()->exists();
+    }
+
+    /**
+     * Get or create the chat room ID for this order.
+     */
+    public function getChatRoomId(): int
+    {
+        $room = ChatRoom::where(function($q) {
+            $q->where('player_id', $this->player_id)->where('e_buddy_id', $this->e_buddy_id);
+        })->orWhere(function($q) {
+            $q->where('player_id', $this->e_buddy_id)->where('e_buddy_id', $this->player_id);
+        })->first();
+
+        if (!$room) {
+            $room = ChatRoom::create([
+                'player_id' => $this->player_id,
+                'e_buddy_id' => $this->e_buddy_id,
+            ]);
+        }
+
+        return $room->id;
     }
 }

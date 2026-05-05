@@ -32,7 +32,7 @@
             </div>
             <span style="font-size:2rem;font-weight:800;color:var(--text);">{{ $pendingOrders }}</span>
             @if($pendingOrders > 0)
-                <a href="{{ route('ebuddy.orders') }}" style="font-size:12px;font-weight:600;color:var(--yellow);text-decoration:none;">Review now →</a>
+                <a href="{{ route('orders', ['type' => 'incoming', 'status' => 'pending']) }}" style="font-size:12px;font-weight:600;color:var(--yellow);text-decoration:none;">Review now →</a>
             @endif
         </div>
 

@@ -11,6 +11,7 @@ class Message extends Model
         'chat_room_id',
         'sender_id',
         'content',
+        'read_at',
         'sent_at',
     ];
 
@@ -18,6 +19,7 @@ class Message extends Model
     {
         return [
             'sent_at' => 'datetime',
+            'read_at' => 'datetime',
         ];
     }
 

@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('chat_room_id')->constrained('chat_rooms')->cascadeOnDelete();
             $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
             $table->text('content');
-            $table->dateTime('sent_at')->useCurrent();
+            $table->timestamp('read_at')->nullable();
+            $table->timestamp('sent_at')->useCurrent();
             $table->timestamps();
         });
     }

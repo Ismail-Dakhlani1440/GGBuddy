@@ -2,63 +2,77 @@
 
 namespace Database\Seeders;
 
-use App\Models\Game;
-use App\Models\Role;
-use App\Models\User;
 use App\Models\EBuddy;
+use App\Models\Game;
+use App\Models\Order;
 use App\Models\Service;
-use App\Models\PlayerGameProfile;
+use App\Models\User;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $ebuddyRole = Role::where('title', 'ebuddy')->first();
-        $games = Game::with('ranks')->get();
+        $ebuddyUser = User::where('email', 'ebuddy@ebuddy.com')->first();
+        $playerUser = User::where('email', 'player@player.com')->first();
+        $ebuddy = EBuddy::where('user_id', $ebuddyUser->id)->first();
+        $games = Game::all();
 
-        if ($games->isEmpty() || !$ebuddyRole) {
-            $this->command->error('Please run DatabaseSeeder first (needs games and roles).');
+        if (!$ebuddy || !$playerUser || $games->isEmpty()) {
             return;
         }
 
-        for ($i = 0; $i < 15; $i++) {
-            $user = User::factory()->create([
-                'role_id' => $ebuddyRole->id,
+        // 1. Create Services
+        $services = [];
+        foreach ($games->take(3) as $game) {
+            $services[] = Service::create([
+                'e_buddy_id' => $ebuddy->user_id,
+                'game_id'    => $game->id,
+                'title'      => "Expert Sessions for {$game->title}",
+                'description' => "Pro gameplay and tips for {$game->title}.",
+                'price'      => 25,
             ]);
-
-            $ebuddy = EBuddy::create([
-                'user_id' => $user->id,
-                'status' => 'active',
-                'global_rating' => rand(30, 50) / 10,
-                'bio' => fake()->paragraph(2),
-            ]);
-
-            // Assign 1 to 3 random games to this E-Buddy
-            $randomGames = $games->random(rand(1, 3));
-
-            foreach ($randomGames as $game) {
-                if ($game->ranks->isEmpty()) continue;
-                
-                $randomRank = $game->ranks->random();
-
-                PlayerGameProfile::create([
-                    'user_id' => $user->id,
-                    'game_id' => $game->id,
-                    'current_rank_id' => $randomRank->id,
-                    'peak_rank_id' => $randomRank->id,
-                ]);
-
-                Service::create([
-                    'e_buddy_id' => $user->id,
-                    'game_id' => $game->id,
-                    'title' => 'I will carry you in ' . $game->title,
-                    'description' => fake()->paragraph(),
-                    'price' => rand(5, 50),
-                ]);
-            }
         }
+
+        // 2. Lifecycle Test Cases
         
-        $this->command->info('Generated 15 demo E-Buddies with profiles and services!');
+        // CASE: READY TO COMPLETE (For Review System Testing)
+        // Duration: 1h, Started: 61m ago
+        $readyToComplete = Order::create([
+            'player_id'    => $playerUser->id,
+            'e_buddy_id'   => $ebuddy->user_id,
+            'service_id'   => $services[0]->id,
+            'status'       => 'paid',
+            'total_amount' => 25,
+            'hours'        => 1,
+            'paid_at'      => Carbon::now()->subMinutes(61), 
+            'expires_at'   => Carbon::now()->subHours(2),
+        ]);
+        $readyToComplete->confirm();
+
+        // CASE: IN PROGRESS (Should be blocked from completion)
+        $inProgress = Order::create([
+            'player_id'    => $playerUser->id,
+            'e_buddy_id'   => $ebuddy->user_id,
+            'service_id'   => $services[1]->id,
+            'status'       => 'paid',
+            'total_amount' => 50,
+            'hours'        => 2,
+            'paid_at'      => Carbon::now()->subMinutes(30), 
+            'expires_at'   => Carbon::now()->subHours(1),
+        ]);
+        $inProgress->confirm();
+
+        // CASE: PENDING
+        Order::create([
+            'player_id'    => $playerUser->id,
+            'e_buddy_id'   => $ebuddy->user_id,
+            'service_id'   => $services[2]->id,
+            'status'       => 'pending',
+            'total_amount' => 25,
+            'hours'        => 1,
+            'expires_at'   => Carbon::now()->addHour(),
+        ]);
     }
 }

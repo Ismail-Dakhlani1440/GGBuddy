@@ -23,10 +23,13 @@ return new class extends Migration
                 'paid',
                 'completed',
                 'expired',
+                'cancelled',
             ])->default('pending');
             $table->float('total_amount');
+            $table->integer('hours')->default(1);
             $table->text('refuse_reason')->nullable();
             $table->dateTime('expires_at');
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
     }

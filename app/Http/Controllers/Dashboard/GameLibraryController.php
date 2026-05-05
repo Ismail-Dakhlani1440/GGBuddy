@@ -45,6 +45,15 @@ class GameLibraryController extends Controller
     public function removeGame(PlayerGameProfile $profile)
     {
         Gate::authorize('delete', $profile);
+        $user = request()->user();
+
+        // Check if there are services for this game
+        if ($user->isEBuddy() && $user->eBuddy) {
+            $hasServices = $user->eBuddy->services()->where('game_id', $profile->game_id)->exists();
+            if ($hasServices) {
+                return back()->with('error', 'Cannot remove this game because you have active services for it. Please delete your services for this game first.');
+            }
+        }
 
         $profile->delete();
 

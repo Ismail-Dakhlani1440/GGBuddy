@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         :root {
             --bg:           #0b0c16;
@@ -366,11 +365,11 @@
             @can('access-ebuddy-features')
                 <a href="{{ route('ebuddy.services') }}" class="nav-link {{ request()->routeIs('ebuddy.services') ? 'active' : '' }}">Services</a>
                 <a href="{{ route('ebuddy.schedule') }}" class="nav-link {{ request()->routeIs('ebuddy.schedule') ? 'active' : '' }}">Schedule</a>
-                <a href="{{ route('ebuddy.orders') }}" class="nav-link {{ request()->routeIs('ebuddy.orders') ? 'active' : '' }}">Incoming Orders</a>
             @endcan
 
             <a href="{{ route('browse.index') }}" class="nav-link {{ request()->routeIs('browse.index') || request()->routeIs('player.dashboard') ? 'active' : '' }}">E-Buddies</a>
-            <a href="{{ route('browse.my-orders') }}" class="nav-link {{ request()->routeIs('browse.my-orders') ? 'active' : '' }}">My Orders</a>
+            <a href="{{ route('orders') }}" class="nav-link {{ request()->routeIs('orders') || request()->routeIs('browse.my-orders') ? 'active' : '' }}">Orders</a>
+            <a href="{{ route('chat') }}" class="nav-link {{ request()->routeIs('chat') ? 'active' : '' }}">Chat</a>
         </div>
 
         <div class="nav-right">
@@ -405,6 +404,38 @@
         </div>
     </div>
 
+    {{-- Notification Audio --}}
+    <audio id="notif-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
+
     @stack('scripts')
+    
+    <script>
+        // Global Message Listener for Browser Notifications
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.Echo) {
+                window.Echo.private(`App.Models.User.{{ auth()->id() }}`)
+                    .listen('MessageSent', (e) => {
+                        // Play sound if enabled
+                        const sound = document.getElementById('notif-sound');
+                        if (sound) sound.play().catch(e => console.log('Sound blocked by browser'));
+
+                        // Show Browser Notification if window is not focused
+                        if (document.visibilityState !== 'visible' && Notification.permission === 'granted') {
+                            new Notification(`New Message from ${e.message.sender.name}`, {
+                                body: e.message.content,
+                                icon: 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + e.message.sender.name
+                            });
+                        }
+                    });
+            }
+
+            // Request Notification Permission on first interaction
+            if (Notification.permission === 'default') {
+                document.addEventListener('click', () => {
+                    Notification.requestPermission();
+                }, { once: true });
+            }
+        });
+    </script>
 </body>
 </html>

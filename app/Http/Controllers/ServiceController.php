@@ -46,6 +46,15 @@ class ServiceController extends Controller
     {
         Gate::authorize('delete', $service);
 
+        // Check for active orders (not completed, refused, cancelled, or expired)
+        $hasActiveOrders = $service->orders()
+            ->whereNotIn('status', ['completed', 'refused', 'cancelled', 'expired'])
+            ->exists();
+
+        if ($hasActiveOrders) {
+            return back()->with('error', 'Cannot delete this service because there are active orders for it.');
+        }
+
         $service->delete();
 
         return back()->with('success', 'Service removed successfully!');

@@ -35,17 +35,12 @@ class BrowseController extends Controller
      */
     public function show(User $ebuddy)
     {
-        // Make sure we're viewing an actual active E-Buddy
-        abort_unless(
-            $ebuddy->isEBuddy() && $ebuddy->eBuddy?->status === 'active',
-            404
-        );
-
-        $ebuddy->load(['eBuddy.services.game', 'gameProfiles.game', 'gameProfiles.currentRank']);
+        $ebuddy->load(['eBuddy.services.game', 'eBuddy.reviews.player', 'gameProfiles.game', 'gameProfiles.currentRank']);
+        $user = $ebuddy; 
 
         $layout = $this->resolveLayout();
 
-        return view('browse.show', compact('ebuddy', 'layout'));
+        return view('browse.show', compact('user', 'ebuddy', 'layout'));
     }
 
     /**
@@ -63,8 +58,9 @@ class BrowseController extends Controller
             'e_buddy_id'   => $service->e_buddy_id,
             'service_id'   => $service->id,
             'total_amount' => $service->price * $validated['hours'],
+            'hours'        => $validated['hours'],
             'status'       => 'pending',
-            'expires_at'   => now()->addHours(24),
+            'expires_at'   => now()->addHour(),
         ]);
 
         return redirect()->back()->with('success', 'Order placed! The E-Buddy will confirm shortly.');

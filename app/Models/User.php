@@ -129,4 +129,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ChatRoom::class, 'player_id');
     }
+
+    public function chatRoomsAsEBuddy(): HasMany
+    {
+        return $this->hasMany(ChatRoom::class, 'e_buddy_id');
+    }
+
+    public function notificationSetting(): HasOne
+    {
+        return $this->hasOne(NotificationSetting::class);
+    }
 }
