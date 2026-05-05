@@ -34,7 +34,7 @@ class GameSeeder extends Seeder
             $game = \App\Models\Game::create([
                 'title' => $gameData['title'],
                 'description' => $gameData['description'],
-                'image' => 'placeholder.png',
+                'cover' => 'placeholder.png',
             ]);
 
             foreach ($gameData['ranks'] as $index => $rankTitle) {

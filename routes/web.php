@@ -3,7 +3,9 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Dashboard\ProfileController;
+use App\Http\Controllers\Dashboard\GameLibraryController;
 use App\Http\Controllers\EBuddyOrderController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ServiceController;
@@ -35,15 +37,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/ebuddy/pending', fn() => view('dashboards.ebuddy-pending'))->name('ebuddy.pending');
     Route::get('/suspended', fn() => view('auth.suspended'))->name('suspended');
 
-    // E-Buddy Profile Management
-    Route::get('/ebuddy/profile', [DashboardController::class, 'showProfile'])->name('ebuddy.profile');
-    Route::get('/ebuddy/profile/edit', [DashboardController::class, 'editProfile'])->name('ebuddy.profile.edit');
-    Route::post('/ebuddy/profile/edit', [DashboardController::class, 'updateProfile'])->name('ebuddy.profile.update');
+    // Profile Management (Shared by Player & E-Buddy)
+    Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
+    Route::get('/profile/edit', [ProfileController::class, 'editProfile'])->name('profile.edit');
+    Route::post('/profile/edit', [ProfileController::class, 'updateProfile'])->name('profile.update');
     
-    // E-Buddy Game Library
-    Route::get('/ebuddy/profile/add-game', [DashboardController::class, 'addGame'])->name('ebuddy.profile.add-game');
-    Route::post('/ebuddy/profile/add-game', [DashboardController::class, 'storeGame'])->name('ebuddy.profile.store-game');
-    Route::delete('/ebuddy/profile/game/{profile}', [DashboardController::class, 'removeGame'])->name('ebuddy.profile.remove-game');
+    // Game Library Management (Shared)
+    Route::get('/profile/add-game', [GameLibraryController::class, 'addGame'])->name('profile.add-game');
+    Route::post('/profile/add-game', [GameLibraryController::class, 'storeGame'])->name('profile.store-game');
+    Route::delete('/profile/game/{profile}', [GameLibraryController::class, 'removeGame'])->name('profile.remove-game');
 
     // E-Buddy Services Management
     Route::get('/ebuddy/services', [ServiceController::class, 'index'])->name('ebuddy.services');

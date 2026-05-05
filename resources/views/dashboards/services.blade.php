@@ -26,7 +26,7 @@
                             <option value="">No games in your library</option>
                         </select>
                         <small style="color:var(--text-2);margin-top:8px;display:block;">
-                            <a href="{{ route('ebuddy.profile.add-game') }}" style="color:var(--primary);text-decoration:none;font-weight:600;">+ Add a game to your library</a> first.
+                            <a href="{{ route('profile.add-game') }}" style="color:var(--primary);text-decoration:none;font-weight:600;">+ Add a game to your library</a> first.
                         </small>
                     @else
                         <select name="game_id" class="form-input">

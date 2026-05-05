@@ -357,27 +357,25 @@
         <a href="{{ route('dashboard') }}" class="logo">GGBuddy</a>
 
         <div class="nav-links">
-            @php
-                $navItems = [
-                    ['route' => 'ebuddy.dashboard', 'label' => 'Overview'],
-                    ['route' => 'ebuddy.profile',  'label' => 'Profile'],
-                    ['route' => 'ebuddy.services', 'label' => 'Services'],
-                    ['route' => 'ebuddy.schedule', 'label' => 'Schedule'],
-                    ['route' => 'ebuddy.orders',   'label' => 'Orders'],
-                    ['route' => 'browse.index',    'label' => 'Browse'],
-                ];
-            @endphp
-            @foreach($navItems as $item)
-                <a href="{{ route($item['route']) }}"
-                   class="nav-link {{ request()->routeIs($item['route']) || request()->routeIs($item['route'].'.*') ? 'active' : '' }}">
-                    {{ $item['label'] }}
-                </a>
-            @endforeach
+            @can('access-ebuddy-features')
+                <a href="{{ route('ebuddy.dashboard') }}" class="nav-link {{ request()->routeIs('ebuddy.dashboard') ? 'active' : '' }}">Overview</a>
+            @endcan
+
+            <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') || request()->routeIs('profile.*') ? 'active' : '' }}">Profile</a>
+
+            @can('access-ebuddy-features')
+                <a href="{{ route('ebuddy.services') }}" class="nav-link {{ request()->routeIs('ebuddy.services') ? 'active' : '' }}">Services</a>
+                <a href="{{ route('ebuddy.schedule') }}" class="nav-link {{ request()->routeIs('ebuddy.schedule') ? 'active' : '' }}">Schedule</a>
+                <a href="{{ route('ebuddy.orders') }}" class="nav-link {{ request()->routeIs('ebuddy.orders') ? 'active' : '' }}">Incoming Orders</a>
+            @endcan
+
+            <a href="{{ route('browse.index') }}" class="nav-link {{ request()->routeIs('browse.index') || request()->routeIs('player.dashboard') ? 'active' : '' }}">E-Buddies</a>
+            <a href="{{ route('browse.my-orders') }}" class="nav-link {{ request()->routeIs('browse.my-orders') ? 'active' : '' }}">My Orders</a>
         </div>
 
         <div class="nav-right">
 
-            <a href="{{ route('ebuddy.profile') }}" class="nav-avatar">
+            <a href="{{ route('profile') }}" class="nav-avatar">
                 <img src="{{ auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . auth()->user()->name }}">
             </a>
             <form action="{{ route('logout') }}" method="POST" style="margin:0;">

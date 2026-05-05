@@ -4,8 +4,13 @@
 
 {{-- Profile Banner — negative margins bleed to edge of page-content padding --}}
 <div style="position:relative;margin:-32px -24px 0;background:linear-gradient(135deg,#1a1040 0%,#0b0c16 40%,#130b2e 100%);overflow:hidden;">
-    <div style="position:absolute;top:-60px;left:10%;width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,0.25) 0%,transparent 65%);pointer-events:none;"></div>
-    <div style="position:absolute;top:-40px;right:5%;width:400px;height:400px;background:radial-gradient(circle,rgba(157,95,245,0.12) 0%,transparent 65%);pointer-events:none;"></div>
+    @if($ebuddy && $ebuddy->banner)
+        <img src="{{ asset('storage/'.$ebuddy->banner) }}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to top, var(--bg) 0%, transparent 100%);pointer-events:none;"></div>
+    @else
+        <div style="position:absolute;top:-60px;left:10%;width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,0.25) 0%,transparent 65%);pointer-events:none;"></div>
+        <div style="position:absolute;top:-40px;right:5%;width:400px;height:400px;background:radial-gradient(circle,rgba(157,95,245,0.12) 0%,transparent 65%);pointer-events:none;"></div>
+    @endif
 
     <div style="position:relative;padding:40px 24px 0;">
         <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;">
@@ -22,15 +27,21 @@
             <div style="padding-bottom:28px;min-width:0;flex:1;">
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px;">
                     <h1 style="font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;">{{ $user->display_name ?? $user->name }}</h1>
-                    <span class="badge badge-purple">Pro E-Buddy</span>
+                    @if($user->isEBuddy())
+                        <span class="badge badge-purple">Pro E-Buddy</span>
+                    @elseif($user->isAdmin())
+                        <span class="badge badge-yellow">Admin</span>
+                    @else
+                        <span class="badge badge-green">Player</span>
+                    @endif
                 </div>
                 <p style="font-size:13px;color:var(--text-2);">Member since {{ $user->created_at->format('M Y') }} · {{ $user->timezone }}</p>
             </div>
 
             {{-- Action buttons --}}
             <div style="padding-bottom:28px;display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;">
-                <a href="{{ route('ebuddy.profile.edit') }}" class="btn btn-primary btn-sm">Edit Profile</a>
-                <a href="{{ route('ebuddy.profile.add-game') }}" class="btn btn-ghost btn-sm">Add Game</a>
+                <a href="{{ route('profile.edit') }}" class="btn btn-primary btn-sm">Edit Profile</a>
+                <a href="{{ route('profile.add-game') }}" class="btn btn-ghost btn-sm">Add Game</a>
             </div>
         </div>
 
@@ -60,12 +71,14 @@
 
         {{-- Main --}}
         <div style="display:flex;flex-direction:column;gap:16px;">
+            @can('access-ebuddy-features')
             <div class="card" style="padding:24px;">
                 <p class="section-title" style="margin-bottom:10px;">About</p>
                 <p style="font-size:14px;line-height:1.75;color:var(--text-2);">
                     {{ $ebuddy->bio ?? 'No bio yet — edit your profile to add one.' }}
                 </p>
             </div>
+            @endcan
 
             @if($userProfiles->count())
             <div class="card" style="padding:24px;">
@@ -86,6 +99,7 @@
         </div>
 
         {{-- Sidebar stats --}}
+        @can('access-ebuddy-features')
         <div class="card" style="padding:20px;">
             <p class="section-title" style="margin-bottom:16px;">Stats</p>
             @php $pstats = [
@@ -101,12 +115,13 @@
             </div>
             @endforeach
         </div>
+        @endcan
     </div>
 
     @elseif($activeTab === 'games')
     <div style="display:flex;flex-direction:column;gap:16px;">
         <div style="display:flex;justify-content:flex-end;">
-            <a href="{{ route('ebuddy.profile.add-game') }}" class="btn btn-primary btn-sm">Add Game</a>
+            <a href="{{ route('profile.add-game') }}" class="btn btn-primary btn-sm">Add Game</a>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">
             @forelse($userProfiles as $profile)
@@ -115,7 +130,7 @@
                     <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:6px;">{{ $profile->game->title }}</p>
                     <p style="font-size:16px;font-weight:800;color:var(--text);">{{ $profile->currentRank->title ?? 'Unranked' }}</p>
                 </div>
-                <form action="{{ route('ebuddy.profile.remove-game', $profile) }}" method="POST" onsubmit="return confirm('Remove this game from your library?')">
+                <form action="{{ route('profile.remove-game', $profile) }}" method="POST" onsubmit="return confirm('Remove this game from your library?')">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                 </form>
@@ -123,7 +138,7 @@
             @empty
             <div style="grid-column:1/-1;padding:56px;text-align:center;border:1.5px dashed var(--border);border-radius:16px;">
                 <p style="color:var(--text-2);margin-bottom:18px;font-size:14px;">No games added yet.</p>
-                <a href="{{ route('ebuddy.profile.add-game') }}" class="btn btn-primary">Add Your First Game</a>
+                <a href="{{ route('profile.add-game') }}" class="btn btn-primary">Add Your First Game</a>
             </div>
             @endforelse
         </div>

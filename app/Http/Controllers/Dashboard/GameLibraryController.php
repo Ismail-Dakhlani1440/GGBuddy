@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Http\Controllers\Dashboard;
+
+use App\Http\Controllers\Controller;
+use App\Models\PlayerGameProfile;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+
+class GameLibraryController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    public function addGame()
+    {
+        $user = request()->user();
+        $games = \App\Models\Game::with('ranks')->get();
+        
+        return view('dashboards.profile.add-game', [
+            'games' => $games,
+            'existingGameIds' => $user->gameProfiles->pluck('game_id')->toArray(),
+        ]);
+    }
+
+    public function storeGame()
+    {
+        $user = request()->user();
+        
+        $validated = request()->validate([
+            'game_id' => 'required|exists:games,id',
+            'rank_id' => 'required|exists:ranks,id',
+        ]);
+
+        PlayerGameProfile::updateOrCreate(
+            ['user_id' => $user->id, 'game_id' => $validated['game_id']],
+            ['current_rank_id' => $validated['rank_id'], 'peak_rank_id' => $validated['rank_id']]
+        );
+
+        return redirect()->route('profile')->with('success', 'Game added to library!');
+    }
+
+    public function removeGame(PlayerGameProfile $profile)
+    {
+        Gate::authorize('delete', $profile);
+
+        $profile->delete();
+
+        return back()->with('success', 'Game removed from library.');
+    }
+}

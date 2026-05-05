@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Service;
-use App\Models\EBuddyOrder;
+use App\Models\Order;
 
 class BrowseController extends Controller
 {
@@ -18,9 +18,11 @@ class BrowseController extends Controller
      */
     public function index()
     {
-        $ebuddies = User::whereHas('role', fn($q) => $q->where('name', 'ebuddy'))
+        $ebuddies = User::whereHas('role', fn($q) => $q->where('title', 'ebuddy'))
+            ->where('id', '!=', auth()->id())
             ->whereHas('eBuddy', fn($q) => $q->where('status', 'active'))
-            ->with(['eBuddy', 'gameProfiles.game', 'gameProfiles.currentRank', 'services.game'])
+            ->whereHas('eBuddy.services')
+            ->with(['eBuddy.services.game', 'gameProfiles.game', 'gameProfiles.currentRank'])
             ->get();
 
         $layout = $this->resolveLayout();
@@ -39,7 +41,7 @@ class BrowseController extends Controller
             404
         );
 
-        $ebuddy->load(['eBuddy', 'gameProfiles.game', 'gameProfiles.currentRank', 'services.game', 'services.rank']);
+        $ebuddy->load(['eBuddy.services.game', 'gameProfiles.game', 'gameProfiles.currentRank']);
 
         $layout = $this->resolveLayout();
 
@@ -56,14 +58,13 @@ class BrowseController extends Controller
             'message' => 'nullable|string|max:500',
         ]);
 
-        EBuddyOrder::create([
-            'player_id'   => auth()->id(),
-            'ebuddy_id'   => $service->user_id,
-            'service_id'  => $service->id,
-            'hours'       => $validated['hours'],
-            'total_price' => $service->price * $validated['hours'],
-            'message'     => $validated['message'] ?? null,
-            'status'      => 'pending',
+        Order::create([
+            'player_id'    => auth()->id(),
+            'e_buddy_id'   => $service->e_buddy_id,
+            'service_id'   => $service->id,
+            'total_amount' => $service->price * $validated['hours'],
+            'status'       => 'pending',
+            'expires_at'   => now()->addHours(24),
         ]);
 
         return redirect()->back()->with('success', 'Order placed! The E-Buddy will confirm shortly.');
@@ -74,8 +75,8 @@ class BrowseController extends Controller
      */
     public function myOrders()
     {
-        $orders = EBuddyOrder::where('player_id', auth()->id())
-            ->with(['service.game', 'eBuddy'])
+        $orders = Order::where('player_id', auth()->id())
+            ->with(['service.game', 'eBuddy.user'])
             ->latest()
             ->get();
 
@@ -89,9 +90,7 @@ class BrowseController extends Controller
      */
     private function resolveLayout(): string
     {
-        if (auth()->user()->isEBuddy()) {
-            return 'layouts.dashboard';
-        }
-        return 'layouts.player';
+        // Unifying layouts: layouts.dashboard uses policies to show correct header links
+        return 'layouts.dashboard';
     }
 }

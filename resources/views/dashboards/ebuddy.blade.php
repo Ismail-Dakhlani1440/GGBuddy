@@ -66,7 +66,7 @@
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
             <a href="{{ route('ebuddy.services') }}" class="btn btn-primary">Manage Services</a>
             <a href="{{ route('ebuddy.schedule') }}" class="btn btn-ghost">Update Availability</a>
-            <a href="{{ route('ebuddy.profile') }}" class="btn btn-ghost">View Profile</a>
+            <a href="{{ route('profile') }}" class="btn btn-ghost">View Profile</a>
         </div>
     </div>
 

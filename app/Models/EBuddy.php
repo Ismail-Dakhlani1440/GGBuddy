@@ -16,6 +16,7 @@ class EBuddy extends Model
         'user_id',
         'status',
         'bio',
+        'banner',
         'global_rating',
         'missed_order_count',
     ];

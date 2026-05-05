@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->enum('status', ['pending', 'active', 'suspended'])->default('pending');
             $table->text('bio')->nullable();
+            $table->string('banner')->nullable();
             $table->decimal('global_rating', 3, 2)->default(0.00);
             $table->unsignedInteger('missed_order_count')->default(0);
             $table->timestamps();

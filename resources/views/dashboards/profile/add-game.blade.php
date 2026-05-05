@@ -16,10 +16,10 @@
             <h1 style="font-size:1.3rem;font-weight:800;letter-spacing:-0.02em;">Add Game to Library</h1>
             <p style="font-size:13px;color:var(--text-2);margin-top:4px;">Select a game and set your current competitive rank.</p>
         </div>
-        <a href="{{ route('ebuddy.profile') }}" class="btn btn-ghost btn-sm">Cancel</a>
+        <a href="{{ route('profile') }}" class="btn btn-ghost btn-sm">Cancel</a>
     </div>
 
-    <form action="{{ route('ebuddy.profile.store-game') }}" method="POST">
+    <form action="{{ route('profile.store-game') }}" method="POST">
         @csrf
 
         {{-- Game Selection --}}
@@ -102,7 +102,7 @@
         </div>
 
         <div style="display:flex;justify-content:flex-end;gap:10px;" x-show="selectedGameId" x-transition>
-            <a href="{{ route('ebuddy.profile') }}" class="btn btn-ghost">Cancel</a>
+            <a href="{{ route('profile') }}" class="btn btn-ghost">Cancel</a>
             <button type="submit" class="btn btn-primary">Add to Library</button>
         </div>
     </form>

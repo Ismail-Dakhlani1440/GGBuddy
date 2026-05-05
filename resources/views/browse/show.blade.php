@@ -4,8 +4,13 @@
 
 {{-- Profile Banner --}}
 <div style="position:relative;margin:-32px -24px 0;background:linear-gradient(135deg,#1a1040 0%,#0b0c16 40%,#130b2e 100%);overflow:hidden;">
-    <div style="position:absolute;top:-60px;left:10%;width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,0.25) 0%,transparent 65%);pointer-events:none;"></div>
-    <div style="position:absolute;top:-40px;right:5%;width:400px;height:400px;background:radial-gradient(circle,rgba(157,95,245,0.12) 0%,transparent 65%);pointer-events:none;"></div>
+    @if($ebuddy->eBuddy && $ebuddy->eBuddy->banner)
+        <img src="{{ asset('storage/'.$ebuddy->eBuddy->banner) }}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none;">
+        <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to top, var(--bg) 0%, transparent 100%);pointer-events:none;"></div>
+    @else
+        <div style="position:absolute;top:-60px;left:10%;width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,0.25) 0%,transparent 65%);pointer-events:none;"></div>
+        <div style="position:absolute;top:-40px;right:5%;width:400px;height:400px;background:radial-gradient(circle,rgba(157,95,245,0.12) 0%,transparent 65%);pointer-events:none;"></div>
+    @endif
 
     <div style="position:relative;padding:40px 24px 0;">
         <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;">
@@ -36,7 +41,7 @@
         {{-- Tabs --}}
         <div style="display:flex;margin-top:28px;border-bottom:1px solid var(--border);">
             @php $activeTab = request('tab', 'about'); @endphp
-            @foreach(['about' => 'About', 'services' => 'Services (' . $ebuddy->services->count() . ')'] as $key => $label)
+            @foreach(['about' => 'About', 'services' => 'Services (' . ($ebuddy->eBuddy ? $ebuddy->eBuddy->services->count() : 0) . ')'] as $key => $label)
             <a href="?tab={{ $key }}" style="padding:12px 20px;font-size:13px;font-weight:600;text-decoration:none;margin-bottom:-1px;border-bottom:2px solid {{ $activeTab === $key ? 'var(--accent-light)' : 'transparent' }};color:{{ $activeTab === $key ? 'var(--text)' : 'var(--text-2)' }};transition:color 0.15s;">
                 {{ $label }}
             </a>
@@ -75,7 +80,7 @@
             @php $stats = [
                 ['label'=>'Rating',   'value'=> number_format($ebuddy->eBuddy?->global_rating ?? 0, 1).' ★', 'color'=>'var(--yellow)'],
                 ['label'=>'Games',    'value'=> $ebuddy->gameProfiles->count(),                               'color'=>'var(--accent-light)'],
-                ['label'=>'Services', 'value'=> $ebuddy->services->count(),                                   'color'=>'var(--text)'],
+                ['label'=>'Services', 'value'=> $ebuddy->eBuddy ? $ebuddy->eBuddy->services->count() : 0,                                   'color'=>'var(--text)'],
             ]; @endphp
             @foreach($stats as $s)
             <div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);">
@@ -87,9 +92,9 @@
         </div>
     </div>
 
-    @elseif($activeTab === 'services')
+    @elseif($activeTab === 'services' && $ebuddy->eBuddy)
     <div style="display:flex;flex-direction:column;gap:14px;">
-        @forelse($ebuddy->services as $service)
+        @forelse($ebuddy->eBuddy->services as $service)
         <div class="card" style="padding:24px;" x-data="{ open: false }">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;">
                 <div style="flex:1;min-width:200px;">

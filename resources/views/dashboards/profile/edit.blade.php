@@ -8,10 +8,10 @@
             <h1 style="font-size:1.3rem;font-weight:800;letter-spacing:-0.02em;">Edit Profile</h1>
             <p style="font-size:13px;color:var(--text-2);margin-top:4px;">Update your public identity.</p>
         </div>
-        <a href="{{ route('ebuddy.profile') }}" class="btn btn-ghost btn-sm">Back</a>
+        <a href="{{ route('profile') }}" class="btn btn-ghost btn-sm">Back</a>
     </div>
 
-    <form action="{{ route('ebuddy.profile.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         {{-- Avatar + Identity --}}
@@ -23,7 +23,7 @@
                         <img id="avatar-preview" src="{{ $user->avatar ? asset('storage/'.$user->avatar) : 'https://api.dicebear.com/7.x/avataaars/svg?seed='.$user->name }}" style="width:100%;height:100%;object-fit:cover;">
                     </div>
                     <label for="avatar" style="font-size:12px;font-weight:600;color:var(--accent-light);cursor:pointer;">Change Photo</label>
-                    <input type="file" id="avatar" name="avatar" class="hidden" onchange="document.getElementById('avatar-preview').src=URL.createObjectURL(this.files[0])">
+                    <input type="file" id="avatar" name="avatar" class="hidden" onchange="document.getElementById('avatar-preview').src=URL.createObjectURL(this.files[0]); this.form.submit();">
                     @error('avatar')<p class="form-error">{{ $message }}</p>@enderror
                 </div>
 
@@ -48,8 +48,29 @@
             </div>
         </div>
 
-        {{-- Bio --}}
+        {{-- Banner & Bio (Only for E-Buddies) --}}
+        @can('access-ebuddy-features')
         <div class="card" style="padding:28px;margin-bottom:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;">
+                <p class="section-title" style="margin-bottom:0;">Banner</p>
+                <label for="banner" style="font-size:12px;font-weight:600;color:var(--accent-light);cursor:pointer;background:rgba(124,58,237,0.1);padding:6px 12px;border-radius:6px;transition:background 0.2s;" onmouseover="this.style.background='rgba(124,58,237,0.2)'" onmouseout="this.style.background='rgba(124,58,237,0.1)'">Change Banner</label>
+                <input type="file" id="banner" name="banner" accept="image/*" class="hidden" onchange="
+                    if(this.files[0].size > 2 * 1024 * 1024) { 
+                        alert('Your image is larger than the 2MB server limit. Please choose a smaller image.'); 
+                        this.value = ''; 
+                    } else { 
+                        document.getElementById('banner-preview').src = URL.createObjectURL(this.files[0]); 
+                        this.form.submit();
+                    }
+                ">
+            </div>
+            
+            <div style="width:100%;height:140px;border-radius:12px;overflow:hidden;border:2px solid rgba(124,58,237,0.2);margin-bottom:8px;background:var(--surface2);">
+                <img id="banner-preview" src="{{ $ebuddy->banner ? asset('storage/'.$ebuddy->banner) : 'https://placehold.co/1200x400/130b2e/7c3aed?text=Banner+Placeholder' }}" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <p style="font-size:12px;color:var(--text-2);margin-bottom:24px;">Recommended size: 1200x400 pixels or larger.</p>
+            @error('banner')<p class="form-error" style="margin-top:-14px;margin-bottom:24px;">{{ $message }}</p>@enderror
+
             <p class="section-title" style="margin-bottom:16px;">Bio</p>
             <div class="form-group">
                 <label class="form-label" for="bio">Tell players about your experience and playstyle</label>
@@ -58,9 +79,10 @@
                 @error('bio')<p class="form-error">{{ $message }}</p>@enderror
             </div>
         </div>
+        @endcan
 
         <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <a href="{{ route('ebuddy.profile') }}" class="btn btn-ghost">Cancel</a>
+            <a href="{{ route('profile') }}" class="btn btn-ghost">Cancel</a>
             <button type="submit" class="btn btn-primary">Save Changes</button>
         </div>
     </form>

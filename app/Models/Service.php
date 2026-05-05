@@ -45,7 +45,7 @@ class Service extends Model
 
     public function getRankAttribute()
     {
-        $profile = PlayerGameProfile::where('user_id', $this->e_buddy_id)
+        $profile = $this->eBuddy->user->gameProfiles()
             ->where('game_id', $this->game_id)
             ->first();
 

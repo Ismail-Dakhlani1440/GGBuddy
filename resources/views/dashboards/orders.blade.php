@@ -3,16 +3,18 @@
 @section('content')
 <div style="display:flex;flex-direction:column;gap:20px;" x-data="{ tab: 'all' }">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
         <div>
             <h1 style="font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;">Orders</h1>
             <p style="font-size:13px;color:var(--text-2);margin-top:3px;">Manage your incoming session requests.</p>
         </div>
-        <div style="display:flex;background:var(--surface2);border-radius:100px;padding:4px;border:1px solid var(--border);gap:2px;">
+
+        {{-- Clean Underline Tabs (Moved to the right) --}}
+        <div style="display:flex;align-items:center;gap:24px;border-bottom:1px solid var(--border);overflow-x:auto;">
             @foreach(['all' => 'All', 'pending' => 'Pending', 'confirmed' => 'Active', 'refused' => 'History'] as $val => $label)
             <button @click="tab='{{ $val }}'"
-                    :style="tab==='{{ $val }}' ? 'background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(124,58,237,0.4);' : 'color:var(--text-2);'"
-                    style="padding:7px 18px;border-radius:100px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:Inter,sans-serif;transition:all 0.15s;">
+                    :style="tab==='{{ $val }}' ? 'color:var(--text);border-bottom:2px solid var(--accent);' : 'color:var(--text-2);border-bottom:2px solid transparent;'"
+                    style="padding-bottom:12px;font-size:14px;font-weight:600;background:none;border:none;border-top:2px solid transparent;cursor:pointer;transition:all 0.2s ease;white-space:nowrap;">
                 {{ $label }}
             </button>
             @endforeach
