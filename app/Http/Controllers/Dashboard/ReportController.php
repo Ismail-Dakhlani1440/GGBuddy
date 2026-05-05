@@ -1,14 +1,19 @@
 <?php
+namespace App\Http\Controllers\Dashboard;
 
-namespace App\Http\Controllers;
-
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Report;
-use App\Http\Requests\StoreReportRequest;
+use App\Http\Requests\Dashboard\StoreReportRequest;
 use Illuminate\Support\Facades\Gate;
 
 class ReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function store(StoreReportRequest $request)
     {
         $target = User::findOrFail($request->target_id);

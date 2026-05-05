@@ -65,19 +65,25 @@ class EBuddy extends Model
     // ── Availability Helpers ───────────────────────────────────────────────
     public function isAvailableNow(): bool
     {
-        if (! $this->isActive()) {
+        // Must be an active E-Buddy first
+        if ($this->status !== 'active') {
             return false;
         }
 
-        $hasActiveSlot = $this->scheduals->contains(
-            fn(Schedual $s) => $s->isActiveNow()
-        );
+        $now = now();
 
-        $isUnavailable = $this->unavailabilities->contains(
-            fn(Unavailability $u) => $u->isActiveNow()
-        );
+        // 1. Check if they have a schedule slot for right now
+        // We use get() to ensure we check the current records in the DB
+        $inSchedule = $this->scheduals()->get()->contains(fn($s) => $s->isActiveNow());
 
-        return $hasActiveSlot && ! $isUnavailable;
+        // 2. Check if they have an active unavailability block right now
+        // A direct query is more reliable and efficient for date ranges
+        $isBlocked = $this->unavailabilities()
+            ->where('start_datetime', '<=', $now)
+            ->where('end_datetime', '>=', $now)
+            ->exists();
+
+        return $inSchedule && !$isBlocked;
     }
 
     // ── Relations ──────────────────────────────────────────────────────────

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->text('refuse_reason')->nullable();
             $table->dateTime('expires_at');
             $table->timestamp('paid_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

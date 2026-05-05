@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreignId('game_id')->constrained('games')->cascadeOnDelete();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->float('price');
+            $table->decimal('price', 10, 2);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

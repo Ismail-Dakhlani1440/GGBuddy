@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('e_buddy_id')->references('user_id')->on('e_buddies')->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
             $table->text('comment')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

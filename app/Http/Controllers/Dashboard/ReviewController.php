@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\StoreReviewRequest;
 use App\Models\Order;
 use App\Models\Review;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class ReviewController extends Controller
     /**
      * Store a new review for an order.
      */
-    public function store(Request $request, Order $order)
+    public function store(StoreReviewRequest $request, Order $order)
     {
         // Only the player of the order can leave a review
         if (auth()->id() !== $order->player_id) {
@@ -28,17 +29,12 @@ class ReviewController extends Controller
             return back()->with('error', 'You have already reviewed this session.');
         }
 
-        $validated = $request->validate([
-            'rating'  => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
-        ]);
-
         Review::create([
             'order_id'   => $order->id,
             'player_id'  => auth()->id(),
             'e_buddy_id' => $order->e_buddy_id,
-            'rating'     => $validated['rating'],
-            'comment'    => $validated['comment'],
+            'rating'     => $request->rating,
+            'comment'    => $request->comment,
         ]);
 
         // Update E-Buddy global rating

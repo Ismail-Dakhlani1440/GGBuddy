@@ -21,13 +21,18 @@ class Schedual extends Model
      */
     public function isActiveNow(): bool
     {
-        $now     = now();
-        $today   = $now->format('l'); // e.g. "Monday"
-        $current = $now->format('H:i:s');
+        $now = now();
+        
+        // Match day of week (e.g. "Tuesday")
+        if (trim($this->day_of_week) !== $now->format('l')) {
+            return false;
+        }
 
-        return $this->day_of_week === $today
-            && $current >= $this->start_time
-            && $current <= $this->end_time;
+        // Parse start and end times for today
+        $start = \Carbon\Carbon::createFromTimeString($this->start_time, $now->timezone);
+        $end   = \Carbon\Carbon::createFromTimeString($this->end_time, $now->timezone);
+
+        return $now->between($start, $end);
     }
 
     // ── Relations ──────────────────────────────────────────────────────────

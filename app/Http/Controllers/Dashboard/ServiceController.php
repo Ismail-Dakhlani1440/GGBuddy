@@ -1,15 +1,19 @@
 <?php
+namespace App\Http\Controllers\Dashboard;
 
-namespace App\Http\Controllers;
-
-use App\Http\Requests\ServiceRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\ServiceRequest;
 use App\Models\Game;
 use App\Models\Service;
 use Illuminate\Support\Facades\Gate;
 
-
 class ServiceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
         Gate::authorize('viewAny', Service::class);

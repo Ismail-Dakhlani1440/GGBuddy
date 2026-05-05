@@ -29,7 +29,13 @@ class Unavailability extends Model
      */
     public function isActiveNow(): bool
     {
-        return now()->between($this->start_datetime, $this->end_datetime);
+        $now = now();
+        
+        // Ensure we are comparing in the same timezone
+        $start = $this->start_datetime->setTimezone($now->timezone);
+        $end   = $this->end_datetime->setTimezone($now->timezone);
+
+        return $now->between($start, $end);
     }
 
     // ── Relations ──────────────────────────────────────────────────────────

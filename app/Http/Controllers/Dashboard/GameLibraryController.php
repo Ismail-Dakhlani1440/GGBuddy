@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\StoreGameRequest;
 use App\Models\PlayerGameProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -25,18 +26,13 @@ class GameLibraryController extends Controller
         ]);
     }
 
-    public function storeGame()
+    public function storeGame(StoreGameRequest $request)
     {
-        $user = request()->user();
+        $user = $request->user();
         
-        $validated = request()->validate([
-            'game_id' => 'required|exists:games,id',
-            'rank_id' => 'required|exists:ranks,id',
-        ]);
-
         PlayerGameProfile::updateOrCreate(
-            ['user_id' => $user->id, 'game_id' => $validated['game_id']],
-            ['current_rank_id' => $validated['rank_id'], 'peak_rank_id' => $validated['rank_id']]
+            ['user_id' => $user->id, 'game_id' => $request->game_id],
+            ['current_rank_id' => $request->rank_id, 'peak_rank_id' => $request->rank_id]
         );
 
         return redirect()->route('profile')->with('success', 'Game added to library!');

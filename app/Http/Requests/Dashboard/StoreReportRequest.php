@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Dashboard;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -8,8 +8,7 @@ class StoreReportRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Permission checked in Policy via Controller
-        return true;
+        return true; // Policy handles authorization
     }
 
     public function rules(): array

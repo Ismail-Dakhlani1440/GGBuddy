@@ -28,6 +28,17 @@
                     <h1 style="font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;">{{ $user->display_name ?? $user->name }}</h1>
                     @if($user->isEBuddy())
                         <span class="badge badge-purple">Pro E-Buddy</span>
+                        @if($user->eBuddy->isAvailableNow())
+                            <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--green);background:rgba(16,185,129,0.1);padding:4px 10px;border-radius:100px;border:1px solid rgba(16,185,129,0.2);">
+                                <span style="width:6px;height:6px;background:var(--green);border-radius:50%;box-shadow:0 0 8px var(--green);"></span>
+                                Online Now
+                            </span>
+                        @else
+                            <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text-3);background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:100px;border:1px solid var(--border);">
+                                <span style="width:6px;height:6px;background:var(--text-3);border-radius:50%;"></span>
+                                Offline
+                            </span>
+                        @endif
                     @else
                         <span class="badge" style="background:rgba(255,255,255,0.05);color:var(--text-2);border:1px solid var(--border);">Player</span>
                     @endif
@@ -207,7 +218,13 @@
                 </div>
             </div>
             @if($user->isEBuddy())
-                <a href="?tab=services" class="btn btn-primary" style="width:100%;margin-top:16px;justify-content:center;">Book a Session</a>
+                @if($user->eBuddy->isAvailableNow())
+                    <a href="?tab=services" class="btn btn-primary" style="width:100%;margin-top:16px;justify-content:center;">Book a Session</a>
+                @else
+                    <div style="width:100%;margin-top:16px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;text-align:center;color:var(--text-3);font-size:13px;font-weight:600;">
+                        Currently Offline
+                    </div>
+                @endif
             @endif
         </div>
     </div>
@@ -226,7 +243,11 @@
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;flex-shrink:0;">
                     <p style="font-size:1.4rem;font-weight:800;color:var(--text);">${{ number_format($service->price, 0) }}<span style="font-size:12px;font-weight:500;color:var(--text-2);">/hr</span></p>
                     @if(auth()->id() !== $user->id)
-                        <button @click="open=true" class="btn btn-primary btn-sm">Book Now</button>
+                        @if($user->eBuddy->isAvailableNow())
+                            <button @click="open=true" class="btn btn-primary btn-sm">Book Now</button>
+                        @else
+                            <button class="btn btn-ghost btn-sm" style="opacity:0.5;cursor:not-allowed;" title="E-Buddy is currently offline">Offline</button>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -331,10 +352,7 @@
         <div class="card" style="padding:48px;text-align:center;border:1.5px dashed var(--border);border-radius:16px;background:var(--surface);">
             <h3 style="font-size:1.2rem;font-weight:800;margin-bottom:8px;">Direct Message</h3>
             <p style="color:var(--text-2);font-size:14px;max-width:400px;margin:0 auto 24px;">Start a private conversation with {{ $user->display_name ?? $user->name }}.</p>
-            <form action="{{ route('chat.start', $user->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-primary">Open Chat Room</button>
-            </form>
+            <a href="{{ route('chat.start', $user->id) }}" class="btn btn-primary" style="text-decoration:none;">Open Chat Room</a>
         </div>
     </div>
     @endif

@@ -121,7 +121,7 @@
                         @endif
                     </div>
 
-                    <a href="{{ route('chat', ['roomId' => $order->getChatRoomId()]) }}" class="btn btn-ghost btn-sm" style="padding:10px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border);"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></a>
+                    <a href="{{ route('chat.start', ['userId' => $otherUser->id]) }}" class="btn btn-ghost btn-sm" style="padding:10px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border);"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></a>
                 </div>
 
                 {{-- Teleport Modals to Body --}}

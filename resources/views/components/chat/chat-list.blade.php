@@ -18,6 +18,7 @@ new class extends Component
     {
         return ChatRoom::where('player_id', Auth::id())
             ->orWhere('e_buddy_id', Auth::id())
+            ->whereHas('messages')
             ->with(['player', 'eBuddy', 'latestMessage'])
             ->get()
             ->sortByDesc(function($room) {

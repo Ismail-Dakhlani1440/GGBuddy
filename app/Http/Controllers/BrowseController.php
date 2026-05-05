@@ -44,49 +44,10 @@ class BrowseController extends Controller
     }
 
     /**
-     * Place an order for a specific service.
-     */
-    public function order(Service $service)
-    {
-        $validated = request()->validate([
-            'hours'   => 'required|numeric|min:1|max:24',
-            'message' => 'nullable|string|max:500',
-        ]);
-
-        Order::create([
-            'player_id'    => auth()->id(),
-            'e_buddy_id'   => $service->e_buddy_id,
-            'service_id'   => $service->id,
-            'total_amount' => $service->price * $validated['hours'],
-            'hours'        => $validated['hours'],
-            'status'       => 'pending',
-            'expires_at'   => now()->addHour(),
-        ]);
-
-        return redirect()->back()->with('success', 'Order placed! The E-Buddy will confirm shortly.');
-    }
-
-    /**
-     * List orders placed BY the current user (player side).
-     */
-    public function myOrders()
-    {
-        $orders = Order::where('player_id', auth()->id())
-            ->with(['service.game', 'eBuddy.user'])
-            ->latest()
-            ->get();
-
-        $layout = $this->resolveLayout();
-
-        return view('browse.my-orders', compact('orders', 'layout'));
-    }
-
-    /**
      * Returns which layout to use based on the auth user's role.
      */
     private function resolveLayout(): string
     {
-        // Unifying layouts: layouts.dashboard uses policies to show correct header links
         return 'layouts.dashboard';
     }
 }

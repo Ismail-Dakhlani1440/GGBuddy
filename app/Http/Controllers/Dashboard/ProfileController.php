@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\UpdateProfileRequest;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
@@ -55,50 +56,40 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function updateProfile()
+    public function updateProfile(UpdateProfileRequest $request)
     {
-        $user = request()->user();
+        $user = $request->user();
         $ebuddy = $user->eBuddy;
 
-        $validated = request()->validate([
-            'display_name' => 'required|string|max:255',
-            'timezone' => 'required|string|max:100',
-            'avatar' => 'nullable|image|max:2048',
-            'bio' => 'nullable|string|max:1000',
-            'banner' => 'nullable|image|max:4096|dimensions:min_width=1200,min_height=400',
-            'browser_notifications' => 'nullable|boolean',
-            'sound_enabled' => 'nullable|boolean',
-        ]);
-
         // Handle Avatar Upload
-        if (request()->hasFile('avatar')) {
-            $path = request()->file('avatar')->store('avatars', 'public');
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
             $user->avatar = $path;
         }
 
         $user->update([
-            'display_name' => $validated['display_name'] ?? $user->display_name,
-            'timezone' => $validated['timezone'] ?? $user->timezone,
+            'display_name' => $request->display_name ?? $user->display_name,
+            'timezone' => $request->timezone ?? $user->timezone,
         ]);
 
         // Update Notification Settings
         $user->notificationSetting()->updateOrCreate(
             ['user_id' => $user->id],
             [
-                'browser_notifications' => request()->has('browser_notifications'),
-                'sound_enabled' => request()->has('sound_enabled'),
+                'browser_notifications' => $request->has('browser_notifications'),
+                'sound_enabled' => $request->has('sound_enabled'),
             ]
         );
 
         if ($ebuddy) {
             // Handle Banner Upload
-            if (request()->hasFile('banner') && request()->file('banner')->isValid()) {
-                $path = request()->file('banner')->store('banners', 'public');
+            if ($request->hasFile('banner') && $request->file('banner')->isValid()) {
+                $path = $request->file('banner')->store('banners', 'public');
                 $ebuddy->banner = $path;
             }
 
-            if (array_key_exists('bio', $validated)) {
-                $ebuddy->bio = $validated['bio'];
+            if ($request->has('bio')) {
+                $ebuddy->bio = $request->bio;
             }
 
             $ebuddy->save();

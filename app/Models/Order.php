@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'player_id',
         'e_buddy_id',
@@ -169,7 +172,7 @@ class Order extends Model
     /**
      * Get or create the chat room ID for this order.
      */
-    public function getChatRoomId(): int
+    public function getChatRoomId(): ?int
     {
         $room = ChatRoom::where(function($q) {
             $q->where('player_id', $this->player_id)->where('e_buddy_id', $this->e_buddy_id);
@@ -177,13 +180,6 @@ class Order extends Model
             $q->where('player_id', $this->e_buddy_id)->where('e_buddy_id', $this->player_id);
         })->first();
 
-        if (!$room) {
-            $room = ChatRoom::create([
-                'player_id' => $this->player_id,
-                'e_buddy_id' => $this->e_buddy_id,
-            ]);
-        }
-
-        return $room->id;
+        return $room?->id;
     }
 }
