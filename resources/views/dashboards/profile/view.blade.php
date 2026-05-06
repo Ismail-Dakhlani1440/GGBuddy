@@ -91,9 +91,16 @@
                 </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">
                     @foreach($userProfiles->take(4) as $profile)
-                    <div style="padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
-                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:4px;">{{ $profile->game->title }}</p>
-                        <p style="font-size:14px;font-weight:700;color:var(--text);">{{ $profile->currentRank->title ?? 'Unranked' }}</p>
+                    <div style="background:var(--surface2);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
+                        <div style="height:60px;position:relative;">
+                            <img src="{{ $profile->game->cover ? asset('storage/'.$profile->game->cover) : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=300' }}" 
+                                 style="width:100%;height:100%;object-fit:cover;opacity:0.6;">
+                            <div style="position:absolute;inset:0;background:linear-gradient(to top, var(--surface2), transparent);"></div>
+                        </div>
+                        <div style="padding:0 14px 14px;">
+                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:4px;">{{ $profile->game->title }}</p>
+                            <p style="font-size:14px;font-weight:700;color:var(--text);">{{ $profile->currentRank->title ?? 'Unranked' }}</p>
+                        </div>
                     </div>
                     @endforeach
                 </div>
@@ -174,15 +181,22 @@
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">
             @forelse($userProfiles as $profile)
-            <div class="card" style="padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                <div>
-                    <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:6px;">{{ $profile->game->title }}</p>
-                    <p style="font-size:16px;font-weight:800;color:var(--text);">{{ $profile->currentRank->title ?? 'Unranked' }}</p>
+            <div class="card" style="display:flex;flex-direction:column;overflow:hidden;padding:0;">
+                <div style="height:120px;position:relative;background:#000;">
+                    <img src="{{ $profile->game->cover ? asset('storage/'.$profile->game->cover) : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400' }}" 
+                         style="width:100%;height:100%;object-fit:cover;opacity:0.8;">
+                    <div style="position:absolute;inset:0;background:linear-gradient(to top, var(--surface), transparent);"></div>
                 </div>
-                <form action="{{ route('profile.remove-game', $profile) }}" method="POST" onsubmit="return confirm('Remove this game from your library?')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                </form>
+                <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:-20px;position:relative;z-index:1;">
+                    <div>
+                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:6px;">{{ $profile->game->title }}</p>
+                        <p style="font-size:16px;font-weight:800;color:var(--text);">{{ $profile->currentRank->title ?? 'Unranked' }}</p>
+                    </div>
+                    <form action="{{ route('profile.remove-game', $profile) }}" method="POST" onsubmit="return confirm('Remove this game from your library?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                    </form>
+                </div>
             </div>
             @empty
             <div style="grid-column:1/-1;padding:56px;text-align:center;border:1.5px dashed var(--border);border-radius:16px;">

@@ -43,16 +43,8 @@
 
                             {{-- Cover Image --}}
                             <div style="height:90px;overflow:hidden;position:relative;background:linear-gradient(135deg,#1a1040,#130b2e);">
-                                @if($game->image)
-                                    <img src="{{ asset('storage/'.$game->image) }}" 
-                                         style="width:100%;height:100%;object-fit:cover;opacity:0.85;">
-                                @else
-                                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
-                                        <div style="width:40px;height:40px;border-radius:10px;background:rgba(124,58,237,0.15);display:flex;align-items:center;justify-content:center;">
-                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(157,95,245,0.6)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-                                        </div>
-                                    </div>
-                                @endif
+                                <img src="{{ $game->cover ? asset('storage/'.$game->cover) : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=400' }}" 
+                                     style="width:100%;height:100%;object-fit:cover;opacity:0.85;">
                                 {{-- Selected overlay --}}
                                 <div x-show="selectedGameId == '{{ $game->id }}'" 
                                      style="position:absolute;inset:0;background:rgba(124,58,237,0.2);display:flex;align-items:center;justify-content:center;">

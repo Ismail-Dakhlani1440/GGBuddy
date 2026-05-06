@@ -11,64 +11,100 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
-            --bg:           #0b0c16;
-            --surface:      #13141f;
-            --surface2:     #1a1c2e;
-            --surface3:     #22243a;
-            --border:       rgba(255,255,255,0.07);
-            --border-2:     rgba(255,255,255,0.12);
-            --accent:       #7c3aed;
-            --accent-light: #9d5ff5;
-            --text:         #ffffff;
-            --text-2:       #9ca3af;
-            --text-3:       #4b5563;
-            --red:          #ef4444;
-            --green:        #22c55e;
+            --bg:           #06070d;
+            --surface:      rgba(255, 255, 255, 0.03);
+            --surface-solid:#11121d;
+            --surface2:     rgba(255, 255, 255, 0.05);
+            --surface3:     rgba(255, 255, 255, 0.08);
+            --border:       rgba(255, 255, 255, 0.08);
+            --border-glow:  rgba(124, 58, 237, 0.3);
+            --accent:       #8b5cf6;
+            --accent-glow:  rgba(139, 92, 246, 0.5);
+            --accent-light: #a78bfa;
+            --text:         #f8fafc;
+            --text-2:       #94a3b8;
+            --text-3:       #475569;
+            --red:          #f43f5e;
+            --green:        #10b981;
+            --glass:        rgba(15, 17, 26, 0.7);
         }
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.5; }
 
         .top-nav {
             position: fixed; top: 0; left: 0; right: 0;
-            background: rgba(11,12,22,0.94); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border); z-index: 200;
-            display: flex; align-items: center; height: 60px; padding: 0 32px;
+            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); z-index: 1000;
+            display: flex; align-items: center; height: 72px; padding: 0 40px;
         }
 
         .logo {
-            font-size: 18px; font-weight: 900; letter-spacing: -0.04em;
-            background: linear-gradient(135deg, #fff 30%, #9d5ff5 100%);
+            font-size: 20px; font-weight: 900; letter-spacing: -0.05em;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-decoration: none; margin-right: 32px;
+            text-decoration: none; margin-right: 48px;
         }
 
-        .nav-links { display: flex; align-items: center; gap: 4px; }
+        .nav-links { display: flex; align-items: center; gap: 8px; }
         .nav-link {
-            padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
-            color: var(--text-2); text-decoration: none; transition: all 0.15s;
+            padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600;
+            color: var(--text-2); text-decoration: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-        .nav-link.active { color: var(--text); font-weight: 600; background: rgba(124,58,237,0.12); }
+        .nav-link:hover { color: white; background: var(--surface2); }
+        .nav-link.active { color: white; background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.2); }
 
-        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+        .nav-right { margin-left: auto; }
 
-        .page-wrapper { padding-top: 60px; min-height: 100vh; }
-        .page-content { max-width: 1100px; margin: 0 auto; padding: 40px 32px; }
+        .page-wrapper { padding-top: 72px; min-height: 100vh; }
+        .page-content { max-width: 1200px; margin: 0 auto; padding: 48px 40px; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .btn {
-            padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 700;
-            text-decoration: none; cursor: pointer; transition: all 0.15s; border: none;
+            padding: 12px 24px; border-radius: 14px; font-size: 14px; font-weight: 800;
+            text-decoration: none; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             font-family: 'Inter', sans-serif;
         }
-        .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border-2); }
-        .btn-ghost:hover { background: var(--surface3); }
-        .btn-primary { background: var(--accent); color: white; }
+        .btn-ghost { background: var(--surface); color: var(--text-2); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--surface2); color: white; border-color: var(--text-2); }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent) 0%, #6d28d9 100%); 
+            color: white; 
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4); 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124, 58, 237, 0.5); }
 
-        .flash-zone { max-width: 1100px; margin: 0 auto; padding: 20px 32px 0; }
-        .flash { padding: 12px 16px; border-radius: 12px; font-size: 13px; font-weight: 500; border: 1px solid transparent; }
-        .flash-success { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); color: var(--green); }
-        .flash-error { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.2); color: var(--red); }
+        .form-group { display: flex; flex-direction: column; gap: 10px; }
+        .form-label { font-size: 12px; font-weight: 800; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.1em; }
+        .form-input {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 14px;
+            padding: 14px 18px; color: white; font-family: 'Inter', sans-serif; font-size: 15px;
+            transition: all 0.2s;
+        }
+        .form-input:focus { outline: none; border-color: var(--accent); background: rgba(139, 92, 246, 0.05); box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); }
+        
+        .card { 
+            background: var(--surface-solid); 
+            border: 1px solid var(--border); 
+            border-radius: 28px; 
+            padding: 40px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .flash-zone { max-width: 1200px; margin: 0 auto; padding: 24px 40px 0; }
+        .flash { padding: 16px 20px; border-radius: 16px; font-size: 14px; font-weight: 600; border: 1px solid transparent; display: flex; align-items: center; gap: 12px; }
+        .flash-success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+        .flash-error { background: rgba(244, 63, 94, 0.1); border-color: rgba(244, 63, 94, 0.2); color: #fb7185; }
     </style>
 </head>
 <body>

@@ -41,7 +41,7 @@ class ChatRoom extends Model
 
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class)->orderBy('sent_at');
+        return $this->hasMany(Message::class, 'chat_room_id')->orderBy('sent_at');
     }
 
     /**

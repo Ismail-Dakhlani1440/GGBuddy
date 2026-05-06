@@ -41,14 +41,4 @@ class Game extends Model
     {
         return $this->hasMany(PlayerGameProfile::class);
     }
-
-    public function matchmakingQueues(): HasMany
-    {
-        return $this->hasMany(MatchmakingQueue::class);
-    }
-
-    public function matches(): HasMany
-    {
-        return $this->hasMany(Matches::class);
-    }
 }

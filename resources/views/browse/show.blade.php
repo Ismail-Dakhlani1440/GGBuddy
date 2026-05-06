@@ -181,9 +181,16 @@
                 <p class="section-title" style="margin-bottom:16px;">Games Played</p>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
                     @foreach($user->gameProfiles as $gp)
-                    <div style="padding:14px 16px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);">
-                        <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:4px;">{{ $gp->game->title }}</p>
-                        <p style="font-size:14px;font-weight:700;color:var(--text);">{{ $gp->currentRank->title ?? 'Unranked' }}</p>
+                    <div style="background:var(--surface2);border-radius:12px;border:1px solid var(--border);overflow:hidden;">
+                        <div style="height:70px;position:relative;">
+                            <img src="{{ $gp->game->cover ? asset('storage/'.$gp->game->cover) : 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=300' }}" 
+                                 style="width:100%;height:100%;object-fit:cover;opacity:0.7;">
+                            <div style="position:absolute;inset:0;background:linear-gradient(to top, var(--surface2), transparent);"></div>
+                        </div>
+                        <div style="padding:0 14px 14px;">
+                            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-light);margin-bottom:4px;">{{ $gp->game->title }}</p>
+                            <p style="font-size:14px;font-weight:700;color:var(--text);">{{ $gp->currentRank->title ?? 'Unranked' }}</p>
+                        </div>
                     </div>
                     @endforeach
                 </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\EBuddy;
@@ -111,7 +111,7 @@ class AdminController extends Controller
         $ebuddy->status = 'active';
         $ebuddy->save();
 
-        return back()->with('success', "E-Buddy application for {$ebuddy->user->name} approved!");
+        return redirect()->route('admin.ebuddies.index')->with('success', "E-Buddy application for {$ebuddy->user->name} approved!");
     }
 
     /**
@@ -122,6 +122,6 @@ class AdminController extends Controller
         $ebuddy->status = 'rejected';
         $ebuddy->save();
 
-        return back()->with('success', "E-Buddy application for {$ebuddy->user->name} rejected.");
+        return redirect()->route('admin.ebuddies.index')->with('success', "E-Buddy application for {$ebuddy->user->name} rejected.");
     }
 }

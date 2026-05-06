@@ -91,6 +91,11 @@ class User extends Authenticatable
         return $this->hasMany(PlayerGameProfile::class);
     }
 
+    public function games()
+    {
+        return $this->hasManyThrough(Game::class, PlayerGameProfile::class, 'user_id', 'id', 'id', 'game_id');
+    }
+
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'player_id');
@@ -114,16 +119,6 @@ class User extends Authenticatable
     public function reportsReceived(): HasMany
     {
         return $this->hasMany(Report::class, 'target_id');
-    }
-
-    public function matchParticipations(): HasMany
-    {
-        return $this->hasMany(MatchParticipation::class);
-    }
-
-    public function matchmakingQueues(): HasMany
-    {
-        return $this->hasMany(MatchmakingQueue::class, 'player_id');
     }
 
     public function chatRoomsAsPlayer(): HasMany
