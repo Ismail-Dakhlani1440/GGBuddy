@@ -1,4 +1,4 @@
-# GGBuddy â€” Full Backend Documentation
+ï»¿# GGBuddy â€” Full Backend Documentation
 
 > Every file, every function, every redirect. Written so you can explain the whole project from memory.
 
@@ -192,16 +192,17 @@
 ---
 
 ## Payment.php
-**Functionality it relates to:** Order Payment Flow, Stripe Integration
+**Functionality it relates to:** Order Payment Flow
+
+> A lightweight audit record automatically managed by the `Order` model's lifecycle methods. The schema contains three columns: `order_id`, `amount` (decimal 10,2), and `status` (enum). No external payment gateway is involved.
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | `isSucceeded()` | Returns `true` if `status === 'succeeded'` | `bool` |
 | `isFailed()` | Returns `true` if `status === 'failed'` | `bool` |
 | `isCanceled()` | Returns `true` if `status === 'canceled'` | `bool` |
-| `isPending()` | Returns `true` if status is any of: `requires_payment_method`, `requires_action`, `processing` | `bool` |
-| `isCleared()` | Returns `true` if `isSucceeded()` â€” meaning the payment went through | `bool` |
-| `order()` | Eloquent relation â€” BelongsTo `Order` | `Order` model |
+| `isProcessing()` | Returns `true` if `status === 'processing'` (initial state set when E-Buddy confirms an order via `confirm()`) | `bool` |
+| `order()` | Eloquent relation - BelongsTo `Order` | `Order` model |
 
 ---
 
@@ -253,15 +254,15 @@
 ---
 
 ## OrderPolicy.php
-**Functionality:** Order Access Control — who can view and manage orders
+**Functionality:** Order Access Control ï¿½ who can view and manage orders
 
 | Function | What it does | Returns |
 |---|---|---|
 | viewAny($user) | Everyone can access the orders index page | true |
-| viewIncoming($user) | Only E-Buddies can view the incoming orders tab | bool — true if E-Buddy |
+| viewIncoming($user) | Only E-Buddies can view the incoming orders tab | bool ï¿½ true if E-Buddy |
 | viewOutgoing($user) | Everyone can have outgoing orders as a player | true |
-| view($user, $order) | Only the player OR the e-buddy on this order can view it | bool — true if user.id matches order.e_buddy_id or order.player_id |
-| update($user, $order) | Only the E-Buddy assigned to the order can accept/refuse/complete it | bool — true if user.id === order.e_buddy_id |
+| view($user, $order) | Only the player OR the e-buddy on this order can view it | bool ï¿½ true if user.id matches order.e_buddy_id or order.player_id |
+| update($user, $order) | Only the E-Buddy assigned to the order can accept/refuse/complete it | bool ï¿½ true if user.id === order.e_buddy_id |
 
 ---
 
@@ -270,11 +271,11 @@
 
 | Function | What it does | Returns |
 |---|---|---|
-| viewAny($user) | Only E-Buddies can see the services management page | bool — true if E-Buddy |
+| viewAny($user) | Only E-Buddies can see the services management page | bool ï¿½ true if E-Buddy |
 | view($user, $service) | Everyone can view a service (used on Browse page) | true |
-| create($user) | Only E-Buddies can create services | bool — true if E-Buddy |
-| update($user, $service) | Only the E-Buddy who owns the service can update it | bool — true if user.id === service.e_buddy_id |
-| delete($user, $service) | Only the E-Buddy who owns the service can delete it | bool — true if user.id === service.e_buddy_id |
+| create($user) | Only E-Buddies can create services | bool ï¿½ true if E-Buddy |
+| update($user, $service) | Only the E-Buddy who owns the service can update it | bool ï¿½ true if user.id === service.e_buddy_id |
+| delete($user, $service) | Only the E-Buddy who owns the service can delete it | bool ï¿½ true if user.id === service.e_buddy_id |
 | restore($user, $service) | Nobody can restore a soft-deleted service | false |
 | forceDelete($user, $service) | Nobody can permanently delete a service | false |
 
@@ -285,9 +286,9 @@
 
 | Function | What it does | Returns |
 |---|---|---|
-| viewAny($user) | Only E-Buddies can view the schedule page | bool — true if E-Buddy |
-| create($user) | Only E-Buddies can add new schedule slots | bool — true if E-Buddy |
-| delete($user, $schedual) | Only the E-Buddy who owns the slot can delete it | bool — true if user.id === schedual.e_buddy_id |
+| viewAny($user) | Only E-Buddies can view the schedule page | bool ï¿½ true if E-Buddy |
+| create($user) | Only E-Buddies can add new schedule slots | bool ï¿½ true if E-Buddy |
+| delete($user, $schedual) | Only the E-Buddy who owns the slot can delete it | bool ï¿½ true if user.id === schedual.e_buddy_id |
 
 ---
 
@@ -296,9 +297,9 @@
 
 | Function | What it does | Returns |
 |---|---|---|
-| viewAny($user) | Only E-Buddies can see their unavailability blocks | bool — true if E-Buddy |
-| create($user) | Only E-Buddies can add unavailability blocks | bool — true if E-Buddy |
-| delete($user, $unavailability) | Only the E-Buddy who owns the block can delete it | bool — true if user.id === unavailability.e_buddy_id |
+| viewAny($user) | Only E-Buddies can see their unavailability blocks | bool ï¿½ true if E-Buddy |
+| create($user) | Only E-Buddies can add unavailability blocks | bool ï¿½ true if E-Buddy |
+| delete($user, $unavailability) | Only the E-Buddy who owns the block can delete it | bool ï¿½ true if user.id === unavailability.e_buddy_id |
 
 ---
 
@@ -308,7 +309,7 @@
 | Function | What it does | Returns |
 |---|---|---|
 | create($user) | Any authenticated user can add a game to their library | true |
-| delete($user, $profile) | Only the owner of the profile entry can remove the game | bool — true if user.id === profile.user_id |
+| delete($user, $profile) | Only the owner of the profile entry can remove the game | bool ï¿½ true if user.id === profile.user_id |
 
 ---
 
@@ -317,7 +318,7 @@
 
 | Function | What it does | Returns |
 |---|---|---|
-| create($user, $	arget) | Blocks self-reporting AND blocks duplicate pending reports against the same target | bool — false if self-report or duplicate |
+| create($user, $	arget) | Blocks self-reporting AND blocks duplicate pending reports against the same target | bool ï¿½ false if self-report or duplicate |
 | viewReports($user, $	arget) | Returns true only if the viewer is NOT the target | bool |
 
 ---
@@ -331,8 +332,9 @@
 
 | Function | What it does | Result |
 |---|---|---|
-| handle($equest, $
-ext) | Checks auth()->check() AND auth()->user()->isAdmin(). If either fails, immediately aborts | HTTP 403 Unauthorized — or passes to next middleware |
+| handle($
+equest, $
+ext) | Checks auth()->check() AND auth()->user()->isAdmin(). If either fails, immediately aborts | HTTP 403 Unauthorized ï¿½ or passes to next middleware |
 
 ---
 
@@ -341,8 +343,9 @@ ext) | Checks auth()->check() AND auth()->user()->isAdmin(). If either fails, im
 
 | Function | What it does | Result |
 |---|---|---|
-| handle($equest, $
-ext) | If the logged-in user is an admin, redirects them away with an error message. Otherwise continues normally | Redirects to admin.dashboard with error flash — or passes through |
+| handle($
+equest, $
+ext) | If the logged-in user is an admin, redirects them away with an error message. Otherwise continues normally | Redirects to admin.dashboard with error flash ï¿½ or passes through |
 
 ---
 
@@ -355,7 +358,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always returns true — everyone can submit the register form | true |
+| authorize() | Always returns true ï¿½ everyone can submit the register form | true |
 | rules() | Validates: role (must be player or ebuddy), name (max 255), display_name (max 255), timezone (optional), avatar (optional), email (unique in users table), password (min 8, confirmed), bio (optional max 1000) | array of validation rules |
 
 ---
@@ -365,7 +368,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Only allows logged-in admins — checks auth()->check() AND isAdmin() | bool |
+| authorize() | Only allows logged-in admins ï¿½ checks auth()->check() AND isAdmin() | bool |
 | rules() | Validates: title (required max 255), description (optional), cover (optional image max 2MB), ranks array with id/title/tier fields | array |
 
 ---
@@ -375,8 +378,8 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — route is protected by is.admin middleware | true |
-| rules() | Validates: title (required, unique in games table), description (optional min 10 chars), cover (required image jpeg/png/jpg/webp max 5MB), ranks array — each rank needs title and tier (integer min 1), icon optional image max 1MB | array |
+| authorize() | Always true ï¿½ route is protected by is.admin middleware | true |
+| rules() | Validates: title (required, unique in games table), description (optional min 10 chars), cover (required image jpeg/png/jpg/webp max 5MB), ranks array ï¿½ each rank needs title and tier (integer min 1), icon optional image max 1MB | array |
 
 ---
 
@@ -385,7 +388,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — route protected by middleware | true |
+| authorize() | Always true ï¿½ route protected by middleware | true |
 | rules() | Same as StoreGameRequest but: title unique rule IGNORES the current game being edited (prevents self-conflict), cover is now optional (not required), ranks can include an id field for existing ranks | array |
 
 ---
@@ -395,7 +398,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Only E-Buddies can submit this form — checks user()->isEBuddy() | bool |
+| authorize() | Only E-Buddies can submit this form ï¿½ checks user()->isEBuddy() | bool |
 | rules() | Validates: game_id (must exist in games table), title (required max 255), description (required max 1000), price (required numeric min 0) | array |
 
 ---
@@ -405,7 +408,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — auth middleware handles it | true |
+| authorize() | Always true ï¿½ auth middleware handles it | true |
 | rules() | Validates: hours (required numeric min 1 max 24), message (optional string max 500) | array |
 
 ---
@@ -415,7 +418,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — Gate authorization in the controller handles it | true |
+| authorize() | Always true ï¿½ Gate authorization in the controller handles it | true |
 | rules() | Validates: refuse_reason (required string min 5 max 255) | array |
 | messages() | Custom messages: refuse_reason.required = Please provide a reason, refuse_reason.min = Must be at least 5 characters | array |
 
@@ -426,7 +429,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — controller checks ownership manually | true |
+| authorize() | Always true ï¿½ controller checks ownership manually | true |
 | rules() | Validates: rating (required integer min 1 max 5), comment (optional string max 1000) | array |
 
 ---
@@ -436,7 +439,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — policy is checked in the controller | true |
+| authorize() | Always true ï¿½ policy is checked in the controller | true |
 | rules() | Validates: target_id (required, must exist in users table), reason (required string min 10 max 1000) | array |
 | messages() | Custom: reason.min = Please provide a more detailed reason (at least 10 characters) | array |
 
@@ -447,7 +450,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — middleware handles auth | true |
+| authorize() | Always true ï¿½ middleware handles auth | true |
 | rules() | Validates: game_id (required, must exist in games table), rank_id (required, must exist in ranks table) | array |
 
 ---
@@ -457,7 +460,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Only E-Buddies can submit — checks isEBuddy() | bool |
+| authorize() | Only E-Buddies can submit ï¿½ checks isEBuddy() | bool |
 | rules() | Validates: day_of_week (required, must be one of the 7 day names), start_time (required H:i format), end_time (required H:i format, must be AFTER start_time) | array |
 
 ---
@@ -467,7 +470,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Only E-Buddies can submit — checks isEBuddy() | bool |
+| authorize() | Only E-Buddies can submit ï¿½ checks isEBuddy() | bool |
 | rules() | Validates: start_datetime (required date), end_datetime (required date, must be AFTER start_datetime), reason (optional max 255) | array |
 
 ---
@@ -477,17 +480,17 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Always true — middleware handles auth | true |
+| authorize() | Always true ï¿½ middleware handles auth | true |
 | rules() | Validates: display_name (required max 255), timezone (required max 100), avatar (optional image file max 2MB), bio (optional max 1000), banner (optional image max 4MB, min dimensions 1200x400px), browser_notifications (optional bool), sound_enabled (optional bool) | array |
 
 ---
 
-## RefuseOrderRequest.php (root — legacy/unused)
+## RefuseOrderRequest.php (root ï¿½ legacy/unused)
 **Functionality:** An older version of the refuse order request at the root namespace
 
 | Method | What it does | Returns |
 |---|---|---|
-| authorize() | Returns false — this request is BLOCKED by default (not used in active routes) | false |
+| authorize() | Returns false ï¿½ this request is BLOCKED by default (not used in active routes) | false |
 | rules() | Validates: message (required string min 1 max 255) | array |
 
 > NOTE: This is a legacy file. The active version is Dashboard/RefuseOrderRequest.php
@@ -499,22 +502,24 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 ---
 
 ## Auth/LoginController.php
-**Functionality:** User Authentication — Login
+**Functionality:** User Authentication ï¿½ Login
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | show() | Displays the login form view | Returns view: auth.login |
-| login($equest) | Validates email+password. Attempts Auth::attempt(). If it fails, returns back with an error message on the email field. If it succeeds, regenerates the session. | Redirects to intended URL or dashboard route — or back with errors |
+| login($
+equest) | Validates email+password. Attempts Auth::attempt(). If it fails, returns back with an error message on the email field. If it succeeds, regenerates the session. | Redirects to intended URL or dashboard route ï¿½ or back with errors |
 
 ---
 
 ## Auth/RegisterController.php
-**Functionality:** User Registration — creates User and optionally an EBuddy profile
+**Functionality:** User Registration ï¿½ creates User and optionally an EBuddy profile
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | show() | Displays the registration form view | Returns view: auth.register |
-| register($equest) | Validates via RegisterRequest. Looks up the Role by title. Creates the User record. If role is ebuddy, also creates an EBuddy record with status=pending. Logs the new user in and regenerates session. | Redirects to intended URL or dashboard route |
+| register($
+equest) | Validates via RegisterRequest. Looks up the Role by title. Creates the User record. If role is ebuddy, also creates an EBuddy record with status=pending. Logs the new user in and regenerates session. | Redirects to intended URL or dashboard route |
 
 ---
 
@@ -523,12 +528,13 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
-| logout($equest) | Calls Auth::logout(), invalidates the session, and regenerates the CSRF token | Redirects to / (homepage) |
+| logout($
+equest) | Calls Auth::logout(), invalidates the session, and regenerates the CSRF token | Redirects to / (homepage) |
 
 ---
 
 ## Dashboard/DashboardController.php
-**Functionality:** Main dashboard router — sends users to the right dashboard based on their role and status
+**Functionality:** Main dashboard router ï¿½ sends users to the right dashboard based on their role and status
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
@@ -543,35 +549,40 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | showProfile() | Loads the authenticated user, their game profiles with ranks, and (if E-Buddy) their reviews | Returns view: dashboards.profile.view |
-| publicProfile($user) | If viewing own profile, redirects to private profile. Otherwise loads the target user's eBuddy services, game profiles and ranks | Redirects to profile route if self — otherwise returns view: dashboards.profile.public |
+| publicProfile($user) | If viewing own profile, redirects to private profile. Otherwise loads the target user's eBuddy services, game profiles and ranks | Redirects to profile route if self ï¿½ otherwise returns view: dashboards.profile.public |
 | editProfile() | Loads the current user and their eBuddy record for the edit form | Returns view: dashboards.profile.edit |
-| updateProfile($equest) | Handles avatar upload to storage/avatars. Updates display_name and timezone. Updates or creates NotificationSetting. If E-Buddy: handles banner upload to storage/banners and updates bio. | Redirects to profile route with success flash |
+| updateProfile($
+equest) | Handles avatar upload to storage/avatars. Updates display_name and timezone. Updates or creates NotificationSetting. If E-Buddy: handles banner upload to storage/banners and updates bio. | Redirects to profile route with success flash |
 
 ---
 
 ## Dashboard/ServiceController.php
-**Functionality:** E-Buddy Service Listings — create and delete services
+**Functionality:** E-Buddy Service Listings ï¿½ create and delete services
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | index() | Authorizes via ServicePolicy::viewAny. Loads games from the E-Buddy's personal library only. Loads all existing services for this E-Buddy. | Returns view: dashboards.services with games and services |
-| store($equest) | Authorizes via ServicePolicy::create. Creates a new Service linked to the E-Buddy's user_id. | Redirects back with success flash |
+| store($
+equest) | Authorizes via ServicePolicy::create. Creates a new Service linked to the E-Buddy's user_id. | Redirects back with success flash |
 | destroy($service) | Authorizes via ServicePolicy::delete. Checks for any non-terminal orders (not completed/refused/cancelled/expired). Refuses deletion if active orders exist. Otherwise soft-deletes the service. | Redirects back with success or error flash |
 
 ---
 
 ## Dashboard/OrderController.php
-**Functionality:** Full order lifecycle management — place, accept, refuse, pay, cancel, complete
+**Functionality:** Full order lifecycle management ï¿½ place, accept, refuse, pay, cancel, complete
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
-| store($equest, $service) | Checks if the E-Buddy isAvailableNow(). If not, returns with error. Creates a new Order with status=pending, calculates total_amount (price x hours), sets expires_at to 1 hour from now. | Redirects back with success or error flash |
-| index($equest) | Reads type query param (incoming/outgoing) and status filter. Authorizes via OrderPolicy. Queries orders for the right side (e_buddy_id or player_id). Applies status filter. Eager loads player, eBuddy.user, service.game, payment. | Returns view: dashboards.orders |
+| store($
+equest, $service) | Checks if the E-Buddy isAvailableNow(). If not, returns with error. Creates a new Order with status=pending, calculates total_amount (price x hours), sets expires_at to 1 hour from now. | Redirects back with success or error flash |
+| index($
+equest) | Reads type query param (incoming/outgoing) and status filter. Authorizes via OrderPolicy. Queries orders for the right side (e_buddy_id or player_id). Applies status filter. Eager loads player, eBuddy.user, service.game, payment. | Returns view: dashboards.orders |
 | accept($order) | Authorizes via OrderPolicy::update (must be the E-Buddy). Checks order isPending(). Calls order->confirm() which creates a Payment record. | Redirects back with success or error flash |
-| refuse($order, $equest) | Authorizes via OrderPolicy::update. Checks order isPending(). Calls order->refuse() with the reason from RefuseOrderRequest. | Redirects back with success or error flash |
+| refuse($order, $
+equest) | Authorizes via OrderPolicy::update. Checks order isPending(). Calls order->refuse() with the reason from RefuseOrderRequest. | Redirects back with success or error flash |
 | pay($order) | Checks auth user is the player (player_id). Checks order isConfirmed(). Calls order->pay() which sets paid_at and updates Payment to succeeded. | Redirects back with success or error flash |
 | cancel($order) | Checks auth user is the player. Checks order is confirmed OR pending. Calls order->cancel() which updates Payment to canceled. | Redirects back with success or error flash |
-| complete($order) | Authorizes via OrderPolicy::update (must be E-Buddy). Checks order isPaid(). Checks hasSessionEnded() — if not ended, returns an error showing remaining time. Calls order->complete(). | Redirects back with success or error flash |
+| complete($order) | Authorizes via OrderPolicy::update (must be E-Buddy). Checks order isPaid(). Checks hasSessionEnded() ï¿½ if not ended, returns an error showing remaining time. Calls order->complete(). | Redirects back with success or error flash |
 
 ---
 
@@ -581,9 +592,11 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | index() | Authorizes via SchedualPolicy::viewAny. Loads all schedule slots ordered by day then time. Loads all future unavailability blocks. | Returns view: dashboards.schedule |
-| storeSchedule($equest) | Authorizes via SchedualPolicy::create. Creates a new Schedual record for the E-Buddy. | Redirects back with success flash |
+| storeSchedule($
+equest) | Authorizes via SchedualPolicy::create. Creates a new Schedual record for the E-Buddy. | Redirects back with success flash |
 | destroySchedule($schedual) | Authorizes via SchedualPolicy::delete. Deletes the schedule slot. | Redirects back with success flash |
-| storeUnavailability($equest) | Authorizes via UnavailabilityPolicy::create. Creates a new Unavailability block. | Redirects back with success flash |
+| storeUnavailability($
+equest) | Authorizes via UnavailabilityPolicy::create. Creates a new Unavailability block. | Redirects back with success flash |
 | destroyUnavailability($unavailability) | Authorizes via UnavailabilityPolicy::delete. Deletes the unavailability block. | Redirects back with success flash |
 
 ---
@@ -594,7 +607,8 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 | Function | What it does | Redirects / Returns |
 |---|---|---|
 | addGame() | Loads all available games with their ranks. Also loads the IDs of games the user already has to prevent duplicates in the form. | Returns view: dashboards.profile.add-game |
-| storeGame($equest) | Uses updateOrCreate to add or update a PlayerGameProfile for the user+game combination. Sets both current_rank_id and peak_rank_id to the chosen rank. | Redirects to profile route with success flash |
+| storeGame($
+equest) | Uses updateOrCreate to add or update a PlayerGameProfile for the user+game combination. Sets both current_rank_id and peak_rank_id to the chosen rank. | Redirects to profile route with success flash |
 | removeGame($profile) | Authorizes via PlayerGameProfilePolicy::delete. If the user is an E-Buddy with active services for this game, blocks the deletion. Otherwise deletes the game profile. | Redirects back with success or error flash |
 
 ---
@@ -604,7 +618,8 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
-| store($equest, $order) | Checks the auth user is the player of the order (HTTP 403 if not). Checks the order isCompleted() — error if not. Checks isReviewed() — error if already reviewed. Creates a Review record. Calls eBuddy->refreshGlobalRating() to recalculate the E-Buddy's rating. | Redirects back with success flash |
+| store($
+equest, $order) | Checks the auth user is the player of the order (HTTP 403 if not). Checks the order isCompleted() ï¿½ error if not. Checks isReviewed() ï¿½ error if already reviewed. Creates a Review record. Calls eBuddy->refreshGlobalRating() to recalculate the E-Buddy's rating. | Redirects back with success flash |
 
 ---
 
@@ -613,7 +628,8 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
-| store($equest) | Validates target_id (must exist) and reason (min 5 chars). Creates a new Report with status=pending, reporter_id = auth user, target_id from form. | Redirects back with success flash |
+| store($
+equest) | Validates target_id (must exist) and reason (min 5 chars). Creates a new Report with status=pending, reporter_id = auth user, target_id from form. | Redirects back with success flash |
 
 ---
 
@@ -625,8 +641,10 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 | dashboard() | Counts pending E-Buddy applications, pending reports, and total users | Returns view: dashboards.admin.overview |
 | indexUsers() | Loads all users except the admin themselves, paginated 20 per page, with their role | Returns view: dashboards.admin.users.index |
 | indexReports() | Loads all pending reports with reporter and target user data, paginated 20 per page | Returns view: dashboards.admin.reports.index |
-| showReport($eport) | Loads a single report with reporter and target | Returns view: dashboards.admin.reports.show |
-| dismissReport($eport) | Sets report status to resolved and stamps resolved_at | Redirects to admin.reports.index with success flash |
+| showReport($
+eport) | Loads a single report with reporter and target | Returns view: dashboards.admin.reports.show |
+| dismissReport($
+eport) | Sets report status to resolved and stamps resolved_at | Redirects to admin.reports.index with success flash |
 | toggleSuspension($user) | Blocks self-suspension. Flips the is_suspended boolean on the user and saves. | Redirects back with success flash showing suspended/unsuspended |
 | ebuddyApplications() | Loads all E-Buddies with status=pending, with their user, paginated 15 per page | Returns view: dashboards.admin.ebuddies.index |
 | approveEBuddy($ebuddy) | Sets E-Buddy status to active | Redirects to admin.ebuddies.index with success flash |
@@ -641,16 +659,19 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 |---|---|---|
 | index() | Loads all games with rank count, paginated 12 per page | Returns view: dashboards.admin.games.index |
 | create() | Shows the create game form | Returns view: dashboards.admin.games.create |
-| store($equest) | Wraps everything in a DB transaction. Uploads cover image to storage/games. Creates the Game record. If ranks are submitted, loops through each rank, uploads icon to storage/ranks, creates each Rank. Commits or rolls back on failure. | Redirects to admin.games.index with success — or back with error flash |
+| store($
+equest) | Wraps everything in a DB transaction. Uploads cover image to storage/games. Creates the Game record. If ranks are submitted, loops through each rank, uploads icon to storage/ranks, creates each Rank. Commits or rolls back on failure. | Redirects to admin.games.index with success ï¿½ or back with error flash |
 | edit($game) | Loads the game and its ranks | Returns view: dashboards.admin.games.edit |
-| update($equest, $game) | DB transaction. Updates game title/description. If new cover uploaded, deletes old one from storage. Loops through ranks: if existing rank (has id), updates it; if new rank (no id), creates it. Deletes old rank icons when a new one is uploaded. | Redirects to admin.games.index with success — or back with error |
+| update($
+equest, $game) | DB transaction. Updates game title/description. If new cover uploaded, deletes old one from storage. Loops through ranks: if existing rank (has id), updates it; if new rank (no id), creates it. Deletes old rank icons when a new one is uploaded. | Redirects to admin.games.index with success ï¿½ or back with error |
 | destroy($game) | Soft-deletes the game (SoftDeletes trait) | Redirects to admin.games.index with success flash |
-| destroyRank($ank) | Deletes the rank icon from storage if it exists. Deletes the Rank record. | Redirects back with success flash |
+| destroyRank($
+ank) | Deletes the rank icon from storage if it exists. Deletes the Rank record. | Redirects back with success flash |
 
 ---
 
 ## BrowseController.php
-**Functionality:** The marketplace — discover and view E-Buddy profiles
+**Functionality:** The marketplace ï¿½ discover and view E-Buddy profiles
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
@@ -664,7 +685,8 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 | Function | What it does | Redirects / Returns |
 |---|---|---|
-| index($oomId) | If a roomId is given, finds the ChatRoom and authorizes the user is a participant (403 if not). Passes the active room to the view. | Returns view: chat.index |
+| index($
+oomId) | If a roomId is given, finds the ChatRoom and authorizes the user is a participant (403 if not). Passes the active room to the view. | Returns view: chat.index |
 | start($userId) | Checks the user isn't chatting with themselves. Looks for an existing ChatRoom between the two users (checks both orderings). If none exists, creates one. | Redirects to chat route with the room ID |
 
 ---
@@ -674,27 +696,29 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 ---
 
 ## MessageSent.php
-**Functionality:** Real-time chat — fires when a new message is saved
+**Functionality:** Real-time chat ï¿½ fires when a new message is saved
 
 | Function | What it does | Broadcasts On |
 |---|---|---|
-| __construct($message) | Stores the Message model as a public property so it gets serialized with the broadcast | — |
+| __construct($message) | Stores the Message model as a public property so it gets serialized with the broadcast | ï¿½ |
 | broadcastOn() | Finds the ChatRoom for this message. Determines the recipient. Returns TWO channels: the shared room channel AND the recipient's private user channel | Private channel: chat.room.{id} AND App.Models.User.{recipientId} |
 | broadcastWith() | Returns the message data including the sender relation loaded | array with message object |
 
-> Implements ShouldBroadcastNow — fires immediately without queuing
+> Implements ShouldBroadcastNow ï¿½ fires immediately without queuing
 
 ---
 
 ## MessageRead.php
-**Functionality:** Real-time chat — fires when a user marks messages as read
+**Functionality:** Real-time chat ï¿½ fires when a user marks messages as read
 
 | Function | What it does | Broadcasts On |
 |---|---|---|
-| __construct($oomId, $eaderId) | Stores the room ID and the ID of the user who read the messages | — |
+| __construct($
+oomId, $
+eaderId) | Stores the room ID and the ID of the user who read the messages | ï¿½ |
 | broadcastOn() | Broadcasts to the shared room channel so the sender's UI can update the read status | Private channel: chat.room.{roomId} |
 
-> Implements ShouldBroadcastNow — fires immediately without queuing
+> Implements ShouldBroadcastNow ï¿½ fires immediately without queuing
 
 ---
 
@@ -702,7 +726,7 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 ---
 
-## routes/web.php — Route Map
+## routes/web.php ï¿½ Route Map
 
 ### Guest Routes (only accessible if NOT logged in)
 | Method | URL | Controller@Method | Route Name |
@@ -776,13 +800,13 @@ ext) | If the logged-in user is an admin, redirects them away with an error mess
 
 ---
 
-## routes/channels.php — Broadcast Channel Authorization
+## routes/channels.php ï¿½ Broadcast Channel Authorization
 
 | Channel | Authorization Logic |
 |---|---|
-| App.Models.User.{id} | User can only listen to their own private channel — checks user.id === id |
-| chat.room.{roomId} | Finds the ChatRoom. Calls hasParticipant(user.id) — only the player or e-buddy of that room can subscribe |
-| match.{matchId} | Legacy matchmaking channel — checks if user is a participant of the match, returns user display data if so |
+| App.Models.User.{id} | User can only listen to their own private channel ï¿½ checks user.id === id |
+| chat.room.{roomId} | Finds the ChatRoom. Calls hasParticipant(user.id) ï¿½ only the player or e-buddy of that room can subscribe |
+| match.{matchId} | Legacy matchmaking channel ï¿½ checks if user is a participant of the match, returns user display data if so |
 | matchmaking.user.{userId} | User can only subscribe to their own matchmaking channel |
 
 ---

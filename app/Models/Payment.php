@@ -13,9 +13,12 @@ class Payment extends Model
         'status',
     ];
 
-    protected $casts = [
-        'amount' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'decimal:2',
+        ];
+    }
 
     // ── Status Helpers ─────────────────────────────────────────────────────
 
