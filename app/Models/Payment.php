@@ -9,43 +9,20 @@ class Payment extends Model
 {
     protected $fillable = [
         'order_id',
-        'stripe_payment_intent_id',
-        'stripe_client_secret',
         'amount',
         'status',
-        'payment_method',
-        'failure_reason',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'amount' => 'float',
-        ];
-    }
+    protected $casts = [
+        'amount' => 'decimal:2',
+    ];
 
     // ── Status Helpers ─────────────────────────────────────────────────────
 
-    public function isSucceeded(): bool { return $this->status === 'succeeded'; }
-    public function isFailed(): bool    { return $this->status === 'failed'; }
-    public function isCanceled(): bool  { return $this->status === 'canceled'; }
-
-    public function isPending(): bool
-    {
-        return in_array($this->status, [
-            'requires_payment_method',
-            'requires_action',
-            'processing',
-        ]);
-    }
-
-    /**
-     * True if the payment was successful and the order can proceed.
-     */
-    public function isCleared(): bool
-    {
-        return $this->isSucceeded();
-    }
+    public function isSucceeded(): bool  { return $this->status === 'succeeded'; }
+    public function isFailed(): bool     { return $this->status === 'failed'; }
+    public function isCanceled(): bool   { return $this->status === 'canceled'; }
+    public function isProcessing(): bool { return $this->status === 'processing'; }
 
     // ── Relations ──────────────────────────────────────────────────────────
 
